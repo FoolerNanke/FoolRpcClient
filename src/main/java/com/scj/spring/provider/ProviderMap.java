@@ -1,5 +1,7 @@
 package com.scj.spring.provider;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 /**
  * @author suchangjie.NANKE
  * @Title: ProviderMap
@@ -8,5 +10,13 @@ package com.scj.spring.provider;
  */
 public class ProviderMap {
 
+    public static Map<String, Object> map = new ConcurrentHashMap<>();
 
+    public static void put(String name, Object obj){
+        map.put(name, obj);
+    }
+
+    public static Object get(String name){
+        return map.get(name);
+    }
 }

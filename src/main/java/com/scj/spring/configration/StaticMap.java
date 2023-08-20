@@ -14,7 +14,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.util.concurrent.Promise;
 import io.netty.util.concurrent.DefaultPromise;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -28,8 +27,8 @@ import java.util.concurrent.ConcurrentMap;
 public class StaticMap {
 
     public static ChannelHandler[] handlers = new ChannelHandler[]{
-            new FoolProtocolEncode<>(), new FoolRespHandler()
-            ,new FoolProtocolDecode()};
+            new FoolProtocolEncode<>(), new FoolProtocolDecode(),
+            new FoolRespHandler()};
 
     /**
      * 序列化存储对象

@@ -31,6 +31,9 @@ public class FoolProtocolEncode<T> extends MessageToByteEncoder<FoolProtocol<T>>
         // 写入序列化方法
         byteBuf.writeByte(foolProtocol.getSerializableType());
 
+        // 写入请求ID
+        byteBuf.writeLong(foolProtocol.getReqId());
+
         // 获取序列化实例
         FoolSerialize foolSerialize = StaticMap.getFoolSerialize(foolProtocol.getSerializableType());
 

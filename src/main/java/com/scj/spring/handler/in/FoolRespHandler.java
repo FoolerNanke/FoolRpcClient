@@ -19,11 +19,10 @@ public class FoolRespHandler extends SimpleChannelInboundHandler<FoolProtocol<Fo
      * 设置返回值
      * @param ctx
      * @param resp
-     * @throws Exception
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
-                                FoolProtocol<FoolResponse> resp) throws Exception {
+                                FoolProtocol<FoolResponse> resp) {
         Promise<FoolResponse> promise = StaticMap.getPromise(resp);
         promise.setSuccess(resp.getData());
         ctx.fireChannelRead(resp);

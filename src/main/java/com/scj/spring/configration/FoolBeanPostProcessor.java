@@ -1,7 +1,10 @@
 package com.scj.spring.configration;
 
 import com.scj.spring.annotation.FoolRpcConsumer;
+import com.scj.spring.annotation.FoolRpcProvider;
+import com.scj.spring.constant.Constant;
 import com.scj.spring.entity.FoolResponse;
+import com.scj.spring.provider.ProviderMap;
 import com.scj.spring.proxy.AbstractFoolProxy;
 import io.netty.util.concurrent.Promise;
 import org.springframework.beans.BeansException;
@@ -32,6 +35,17 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
+        // provider
+        FoolRpcProvider provider = clazz.getAnnotation(FoolRpcProvider.class);
+        if (provider != null){
+            Class<?>[] interfaces = clazz.getInterfaces();
+            // 对所有继承的接口进行映射扩展
+            for (Class<?> anInterface : interfaces) {
+                String name = anInterface.getName() ;
+                ProviderMap.put(name, bean);
+            }
+        }
+        // consumer
         for (Field declaredField : clazz.getDeclaredFields()) {
             // 判断注解是否存在
             FoolRpcConsumer annotation = declaredField.getAnnotation(FoolRpcConsumer.class);
@@ -46,7 +60,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
                     Promise<FoolResponse> intercept = (Promise<FoolResponse>) abstractFoolProxy
                                     .intercept(o, method, objects, methodProxy);
-                    return intercept.get(annotation.timeOut(), annotation.timeUnit());
+                    FoolResponse foolResponse = intercept.get(annotation.timeOut(), annotation.timeUnit());
+                    return foolResponse.getData();
                 });
                 declaredField.set(bean, enhancer.create());
             } catch (IllegalAccessException e) {

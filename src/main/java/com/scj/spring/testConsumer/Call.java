@@ -8,5 +8,5 @@ package com.scj.spring.testConsumer;
  */
 public interface Call {
 
-    String testCall(String s1, String s2);
+    String testCall(String s1, String s2, int int1);
 }

@@ -45,8 +45,7 @@ public class DefaultProxy extends AbstractFoolProxy {
         /*
         通过全类名获取下游地址
          */
-        String fullClassName = String.join(Constant.GAP_POINT,
-                obj.getClass().getPackageName(), obj.getClass().getName());
+        String fullClassName = obj.getClass().getName().split("\\$\\$")[0];
         InetSocketAddress rpcAddress = remoteServer.getRpcAddress(fullClassName);
         /*
         获取连接通道

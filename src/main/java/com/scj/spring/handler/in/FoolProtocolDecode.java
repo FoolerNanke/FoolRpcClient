@@ -4,6 +4,7 @@ import com.scj.spring.configration.StaticMap;
 import com.scj.spring.constant.Constant;
 import com.scj.spring.entity.FoolProtocol;
 import com.scj.spring.entity.FoolRequest;
+import com.scj.spring.entity.FoolResponse;
 import com.scj.spring.serialize.FoolSerialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,8 +45,10 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
         // 获取请求类型
         byte remoteType = byteBuf.readByte();
 
-        // 获取编解码方式
+        // 获取编序列化方式
         byte serializeType = byteBuf.readByte();
+
+        long reqId = byteBuf.readLong();
 
         // 获取消息体长度
         int dataLen = byteBuf.readInt();
@@ -60,18 +63,27 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
         byte[] data = new byte[dataLen];
         byteBuf.readBytes(data);
 
-        FoolProtocol<FoolRequest> foolProtocol = new FoolProtocol<>();
+        FoolProtocol<Object> foolProtocol = new FoolProtocol<>();
         foolProtocol.setMagic(magic);
         foolProtocol.setRemoteType(remoteType);
         foolProtocol.setVersion(version);
         foolProtocol.setSerializableType(serializeType);
+        foolProtocol.setReqId(reqId);
 
         // 消息体反序列化
         FoolSerialize foolSerialize = StaticMap.getFoolSerialize(serializeType);
-        FoolRequest foolRequest = foolSerialize.deSerialize(data, FoolRequest.class);
 
+        Object obj = null;
+        switch (remoteType) {
+            case Constant.REMOTE_REQ:
+                obj = foolSerialize.deSerialize(data, FoolRequest.class);
+                break;
+            case Constant.REMOTE_RESP:
+                obj = foolSerialize.deSerialize(data, FoolResponse.class);
+                break;
+        }
         // 填充消息体
-        foolProtocol.setData(foolRequest);
+        foolProtocol.setData(obj);
         list.add(foolProtocol);
     }
 }
