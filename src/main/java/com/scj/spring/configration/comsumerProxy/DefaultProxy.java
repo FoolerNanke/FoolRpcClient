@@ -1,8 +1,8 @@
-package com.scj.spring.proxy;
+package com.scj.spring.configration.comsumerProxy;
 
-import com.scj.spring.configration.StaticMap;
+import com.scj.spring.constant.LocalCache;
+import com.scj.spring.constant.ObjectConstant;
 import com.scj.spring.constant.Constant;
-import com.scj.spring.constant.EventLoopPool;
 import com.scj.spring.entity.FoolProtocol;
 import com.scj.spring.entity.FoolRequest;
 import com.scj.spring.entity.FoolResponse;
@@ -12,18 +12,13 @@ import com.scj.spring.remote.RemoteServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.concurrent.Promise;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Iterator;
 
 /**
  * @author suchangjie.NANKE
@@ -35,13 +30,11 @@ import java.util.Iterator;
 @Component
 public class DefaultProxy extends AbstractFoolProxy {
 
-//    private final Logger logger = LoggerFactory.getLogger(DefaultProxy.class);
-
     @Autowired
     private RemoteServer remoteServer;
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
         /*
         通过全类名获取下游地址
          */
@@ -50,50 +43,60 @@ public class DefaultProxy extends AbstractFoolProxy {
         /*
         获取连接通道
          */
-        Channel clientChannel = getClientChannel(rpcAddress, StaticMap.handlers);
+        Channel clientChannel = getClientChannel(rpcAddress);
         /*
         构建请求
          */
         // 基础信息填充
         FoolProtocol<FoolRequest> requestFoolProtocol = new FoolProtocol<>();
+        // 设置请求类型
         requestFoolProtocol.setRemoteType(Constant.REMOTE_REQ);
-
+        // 设置请求体
         FoolRequest foolRequest = new FoolRequest();
+        // 填充请求参数
         foolRequest.setArgs(args);
+        // 填充参数类型
+        String[] argsType = new String[args.length];
+        for (int i = 0; i < argsType.length; i++) {
+            argsType[i] = method.getParameterTypes()[i].getName();
+        }
+        foolRequest.setArgsType(argsType);
+        // 填充全类名
         foolRequest.setFullClassName(fullClassName);
+        // 填充方法
         foolRequest.setMethodName(method.getName());
+        // 将请求体填充进FoolProtocol中
         requestFoolProtocol.setData(foolRequest);
+        // 根据该请求存储对应的Promise对象
+        // 该Promise对象将用来存储响应返回值
+        Promise<FoolResponse> foolResponsePromise = LocalCache.handNewReq(requestFoolProtocol);
         /*
         发送请求
          */
-        Promise<FoolResponse> foolResponsePromise = StaticMap.delNewReq(requestFoolProtocol);
         clientChannel.writeAndFlush(requestFoolProtocol);
         return foolResponsePromise;
     }
 
     /**
      * @param address 远程请求地址
-     * @param handlers 处理流程
      * @return 远程请求客户端
      */
-    public Channel getClientChannel(InetSocketAddress address, ChannelHandler...handlers) {
+    public Channel getClientChannel(InetSocketAddress address) {
         try {
             return new Bootstrap()
-                    .group(EventLoopPool.reqEventLoop)
+                    .group(ObjectConstant.reqEventLoop)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
-                        protected void initChannel(NioSocketChannel channel) {
-                        Iterator<ChannelHandler> iterator = Arrays.stream(handlers).iterator();
-                        while (iterator.hasNext()){
-                            ChannelHandler next = iterator.next();
-                            channel.pipeline().addLast(next);
-                        }
+                        protected void initChannel(NioSocketChannel channel) throws Exception {
+                            channel.pipeline()
+                                    .addLast(new FoolProtocolEncode<>())
+                                    .addLast(new FoolProtocolDecode())
+                                    .addLast(ObjectConstant.foolRespHandler);
                         }
                     }).connect(address).sync().channel();
         } catch (Exception e) {
-            //logger.info("getClientChannel error {}", e.getMessage());
-            System.out.println(e);
+            System.out.println(e.getMessage());
         }
         return null;
     }

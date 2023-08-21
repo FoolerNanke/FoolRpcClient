@@ -1,4 +1,4 @@
-package com.scj.spring.proxy;
+package com.scj.spring.configration.comsumerProxy;
 
 import org.springframework.cglib.proxy.MethodInterceptor;
 

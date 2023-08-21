@@ -3,6 +3,7 @@ package com.scj.spring.entity;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * @author suchangjie.NANKE
@@ -22,4 +23,7 @@ public class FoolRequest implements Serializable {
 
     // 参数列表
     private Object[] args;
+
+    // 参数类型
+    private String[] argsType;
 }
