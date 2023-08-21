@@ -1,8 +1,9 @@
-package com.scj.spring.provider;
+package com.scj.spring.configration.providerServer;
 
 import com.scj.spring.constant.Constant;
-import com.scj.spring.constant.EventLoopPool;
+import com.scj.spring.constant.ObjectConstant;
 import com.scj.spring.handler.in.FoolProtocolDecode;
+import com.scj.spring.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -23,18 +24,14 @@ public class Provider {
 
     public Provider(){
         new ServerBootstrap()
-                .group(EventLoopPool.reqEventLoop)
+                .group(ObjectConstant.reqEventLoop)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
-                    protected void initChannel(NioSocketChannel channel) throws Exception {
+                    protected void initChannel(NioSocketChannel channel) {
                         channel.pipeline().addLast(new FoolProtocolDecode());
-                        channel.pipeline().addLast(new ChannelInboundHandlerAdapter(){
-                            @Override
-                            public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-                                System.out.println(msg);
-                            }
-                        });
+                        channel.pipeline().addLast(new FoolProtocolEncode<>());
+                        channel.pipeline().addLast(ObjectConstant.foolReqHandler);
                     }
                 }).bind(Constant.PORT);
     }

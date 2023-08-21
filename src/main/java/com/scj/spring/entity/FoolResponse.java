@@ -16,6 +16,6 @@ public class FoolResponse implements Serializable {
     // 回复对象全类名
     private String fullClassName;
 
-    // 参数列表
+    // 响应结果列表
     private Object data;
 }

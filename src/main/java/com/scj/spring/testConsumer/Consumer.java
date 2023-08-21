@@ -17,6 +17,6 @@ public class Consumer {
     private Call call;
 
     public String get(){
-        return call.testCall("s1", "s2");
+        return call.testCall("hello ", "FoolRpc :", 0xF001);
     }
 }

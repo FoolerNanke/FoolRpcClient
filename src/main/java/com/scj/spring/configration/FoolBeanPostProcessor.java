@@ -1,8 +1,10 @@
 package com.scj.spring.configration;
 
 import com.scj.spring.annotation.FoolRpcConsumer;
+import com.scj.spring.annotation.FoolRpcProvider;
+import com.scj.spring.constant.LocalCache;
 import com.scj.spring.entity.FoolResponse;
-import com.scj.spring.proxy.AbstractFoolProxy;
+import com.scj.spring.configration.comsumerProxy.AbstractFoolProxy;
 import io.netty.util.concurrent.Promise;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,25 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
+        /*
+         provider 扫描
+         */
+        FoolRpcProvider provider = clazz.getAnnotation(FoolRpcProvider.class);
+        if (provider != null){
+            Class<?>[] interfaces = clazz.getInterfaces();
+            // 对所有继承的接口进行映射扩展
+            for (Class<?> inter : interfaces) {
+                /*
+                 覆盖式
+                 如果一个接口存在多个实现 且均被 @FoolRpcProvider 修饰
+                 则只会存储最后一个被扫描到的Bean
+                 */
+                LocalCache.put(inter.getName(), bean);
+            }
+        }
+        /*
+         consumer 增强
+         */
         for (Field declaredField : clazz.getDeclaredFields()) {
             // 判断注解是否存在
             FoolRpcConsumer annotation = declaredField.getAnnotation(FoolRpcConsumer.class);
@@ -44,9 +65,16 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(declaredField.getType());
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
-                    Promise<FoolResponse> intercept = (Promise<FoolResponse>) abstractFoolProxy
-                                    .intercept(o, method, objects, methodProxy);
-                    return intercept.get(annotation.timeOut(), annotation.timeUnit());
+                    // 类型强转
+                    Promise<?> intercept = (Promise<?>) abstractFoolProxy
+                            .intercept(o, method, objects, methodProxy);
+                    // 获取响应结果
+                    // 等待时间取自 消费注解
+                    // TODO 后续新增拓展
+                    // TODO 该接口的请求结果可不消费 或者异步响应消费
+                    FoolResponse foolResponse = (FoolResponse) intercept
+                            .get(annotation.timeOut(), annotation.timeUnit());
+                    return foolResponse.getData();
                 });
                 declaredField.set(bean, enhancer.create());
             } catch (IllegalAccessException e) {

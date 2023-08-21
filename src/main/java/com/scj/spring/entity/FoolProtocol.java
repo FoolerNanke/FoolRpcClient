@@ -26,11 +26,11 @@ public class FoolProtocol<T> implements Serializable {
     // 序列化方法
     private byte SerializableType = Constant.HESSIAN;
 
-    // 请求 ID
-    private Long reqId = new Random().nextLong();
-
     // 请求类型
     private byte remoteType;
+
+    // 请求 ID
+    private Long reqId = new Random().nextLong();
 
     // 请求数据
     private T data;
