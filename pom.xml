@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.scj</groupId>
-    <artifactId>FoolRPC</artifactId>
+    <artifactId>FoolRpcClient</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>FoolRPC</name>
-    <description>FoolRPC</description>
+    <name>FoolRpcClient</name>
+    <description>FoolRpcClient</description>
     <properties>
         <java.version>17</java.version>
     </properties>
