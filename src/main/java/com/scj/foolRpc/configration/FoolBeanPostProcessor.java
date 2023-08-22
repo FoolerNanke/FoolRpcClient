@@ -5,10 +5,13 @@ import com.scj.foolRpc.annotation.FoolRpcProvider;
 import com.scj.foolRpc.constant.LocalCache;
 import com.scj.foolRpc.entity.FoolResponse;
 import com.scj.foolRpc.configration.comsumerProxy.AbstractFoolProxy;
+import com.scj.foolRpc.exception.ExceptionEnum;
+import com.scj.foolRpc.exception.FoolException;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.Promise;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -32,6 +35,8 @@ import java.util.concurrent.ExecutionException;
  * 在 “后置函数” 中通过识别 该类的属性上的 @FoolRpcConsumer 注解
  * 来对属性进行增强 使得其函数可以完成远程调用
  */
+
+@Slf4j
 @Configuration
 public class FoolBeanPostProcessor implements BeanPostProcessor {
 
@@ -89,7 +94,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                             String callBackMethod = annotation.CallBackMethod();
                             if (!callBackMethod.contains(".")) {
                                 // 未填写回调地址
-                                System.out.println("error 未填写回调地址");
+                                log.error("回调函数填写异常");
+                                throw new FoolException(ExceptionEnum.CALL_BACK_METHOD_ERROR);
                             }
 
                             // 设置回调函数
@@ -107,7 +113,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                                              | IllegalAccessException
                                              | InvocationTargetException e){
                                         // 方法不存在或者方法无法访问
-                                        System.out.println(e.getMessage());
+                                        log.error("回调函数填写异常");
+                                        throw new FoolException(ExceptionEnum.CALL_BACK_METHOD_ERROR, e);
                                     }
                                 }
                             });
@@ -120,7 +127,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                 });
                 declaredField.set(bean, enhancer.create());
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                log.error("Bean增强异常");
+                throw new FoolException(ExceptionEnum.ILLEGAL_ACCESS, e);
             }
         }
         return bean;

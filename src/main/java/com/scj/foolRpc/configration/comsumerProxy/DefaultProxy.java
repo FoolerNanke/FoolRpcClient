@@ -6,6 +6,8 @@ import com.scj.foolRpc.constant.Constant;
 import com.scj.foolRpc.entity.FoolProtocol;
 import com.scj.foolRpc.entity.FoolRequest;
 import com.scj.foolRpc.entity.FoolResponse;
+import com.scj.foolRpc.exception.ExceptionEnum;
+import com.scj.foolRpc.exception.FoolException;
 import com.scj.foolRpc.handler.in.FoolProtocolDecode;
 import com.scj.foolRpc.handler.out.FoolProtocolEncode;
 import com.scj.foolRpc.remote.RemoteServer;
@@ -13,6 +15,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Promise;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.stereotype.Component;
@@ -27,6 +30,8 @@ import java.net.InetSocketAddress;
  * @description
  * 默认代理组件
  */
+
+@Slf4j
 @Component
 public class DefaultProxy extends AbstractFoolProxy {
 
@@ -34,7 +39,7 @@ public class DefaultProxy extends AbstractFoolProxy {
     private RemoteServer remoteServer;
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) {
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws FoolException{
         /*
         通过全类名获取下游地址
          */
@@ -95,9 +100,9 @@ public class DefaultProxy extends AbstractFoolProxy {
                                     .addLast(ObjectConstant.foolRespHandler);
                         }
                     }).connect(address).sync().channel();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        } catch (InterruptedException e) {
+            log.error("远程链接发生中断异常 error:{} address:{}", e.getMessage(), address);
+            throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
         }
-        return null;
     }
 }

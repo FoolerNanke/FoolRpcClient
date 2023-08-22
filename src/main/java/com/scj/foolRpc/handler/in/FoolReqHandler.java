@@ -5,11 +5,15 @@ import com.scj.foolRpc.constant.LocalCache;
 import com.scj.foolRpc.entity.FoolProtocol;
 import com.scj.foolRpc.entity.FoolRequest;
 import com.scj.foolRpc.entity.FoolResponse;
+import com.scj.foolRpc.exception.ExceptionEnum;
+import com.scj.foolRpc.exception.FoolException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 /**
  * @author suchangjie.NANKE
@@ -18,6 +22,7 @@ import java.lang.reflect.Method;
  * @description 请求处理器
  */
 
+@Slf4j
 @ChannelHandler.Sharable
 public class FoolReqHandler  extends SimpleChannelInboundHandler<FoolProtocol<FoolRequest>> {
 
@@ -39,8 +44,9 @@ public class FoolReqHandler  extends SimpleChannelInboundHandler<FoolProtocol<Fo
             }
         }
         if (method == null){
-            System.out.println("error");
-            return;
+            log.error("远程请求类名为{}, 请求方法名为{}, 请求参数类型为{}, 无法在对应类下找到该方法",
+                    request.getFullClassName(), request.getMethodName(), Arrays.toString(request.getArgsType()));
+            throw new FoolException(ExceptionEnum.METHOD_NOT_EXIST);
         }
         // 强制访问方法
         method.setAccessible(true);

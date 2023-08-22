@@ -5,10 +5,13 @@ import com.scj.foolRpc.constant.Constant;
 import com.scj.foolRpc.entity.FoolProtocol;
 import com.scj.foolRpc.entity.FoolRequest;
 import com.scj.foolRpc.entity.FoolResponse;
+import com.scj.foolRpc.exception.ExceptionEnum;
+import com.scj.foolRpc.exception.FoolException;
 import com.scj.foolRpc.serialize.FoolSerialize;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -18,6 +21,8 @@ import java.util.List;
  * @date 2023/8/13 11:40
  * @description 消息解码器
  */
+
+@Slf4j
 public class FoolProtocolDecode extends ByteToMessageDecoder {
 
     @Override
@@ -32,8 +37,8 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
         // 获取魔数
         short magic = byteBuf.readShort();
         if (magic != Constant.MAGIC) {
-            System.out.println("协议不匹配");
-            return;
+            log.error("协议不匹配, 远程请求协议魔数为{}", magic);
+            throw new FoolException(ExceptionEnum.PROTOCOL_NOT_MATCH);
         }
         // 获取版本号
         byte version = byteBuf.readByte();
