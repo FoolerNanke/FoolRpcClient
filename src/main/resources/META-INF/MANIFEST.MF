@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Main-Class: 
+Class-Path: netty-codec-haproxy-4.1.94.Final.jar logback-core-1.4.8.jar 
+ netty-all-4.1.86.Final.jar protostuff-core-1.0.8.jar lombok-1.18.28.jar
+  netty-transport-classes-epoll-4.1.94.Final.jar netty-resolver-dns-clas
+ ses-macos-4.1.94.Final.jar log4j-to-slf4j-2.20.0.jar spring-core-6.0.11
+ .jar netty-resolver-dns-native-macos-4.1.94.Final-osx-aarch_64.jar nett
+ y-transport-native-epoll-4.1.94.Final-linux-x86_64.jar protostuff-api-1
+ .0.8.jar netty-codec-redis-4.1.94.Final.jar netty-handler-4.1.94.Final.
+ jar netty-transport-4.1.94.Final.jar netty-transport-udt-4.1.94.Final.j
+ ar netty-handler-ssl-ocsp-4.1.94.Final.jar spring-boot-starter-3.1.2.ja
+ r netty-codec-4.1.94.Final.jar slf4j-api-2.0.7.jar netty-transport-clas
+ ses-kqueue-4.1.94.Final.jar hessian-4.0.62.jar netty-codec-socks-4.1.94
+ .Final.jar netty-codec-http2-4.1.94.Final.jar spring-expression-6.0.11.
+ jar netty-transport-rxtx-4.1.94.Final.jar spring-beans-6.0.11.jar netty
+ -transport-sctp-4.1.94.Final.jar netty-resolver-4.1.94.Final.jar netty-
+ codec-dns-4.1.94.Final.jar spring-context-6.0.11.jar spring-aop-6.0.11.
+ jar spring-jcl-6.0.11.jar netty-handler-proxy-4.1.94.Final.jar netty-co
+ dec-smtp-4.1.94.Final.jar netty-codec-memcache-4.1.94.Final.jar netty-t
+ ransport-native-unix-common-4.1.94.Final.jar log4j-api-2.20.0.jar netty
+ -resolver-dns-native-macos-4.1.94.Final-osx-x86_64.jar snakeyaml-1.33.j
+ ar netty-transport-native-epoll-4.1.94.Final-linux-aarch_64.jar netty-c
+ ommon-4.1.94.Final.jar netty-transport-native-kqueue-4.1.94.Final-osx-a
+ arch_64.jar spring-boot-3.1.2.jar logback-classic-1.4.8.jar netty-codec
+ -mqtt-4.1.94.Final.jar jakarta.annotation-api-2.1.1.jar netty-codec-sto
+ mp-4.1.94.Final.jar netty-resolver-dns-4.1.94.Final.jar spring-boot-sta
+ rter-logging-3.1.2.jar jul-to-slf4j-2.0.7.jar netty-transport-native-kq
+ ueue-4.1.94.Final-osx-x86_64.jar netty-codec-http-4.1.94.Final.jar spri
+ ng-boot-autoconfigure-3.1.2.jar netty-buffer-4.1.94.Final.jar netty-cod
+ ec-xml-4.1.94.Final.jar
+

@@ -68,11 +68,18 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
         // 消息体反序列化
         FoolSerialize foolSerialize = LocalCache.getFoolSerialize(serializeType);
         // 填充消息体
-        foolProtocol.setData(switch (remoteType) {
-            case Constant.REMOTE_REQ -> foolSerialize.deSerialize(data, FoolRequest.class);
-            case Constant.REMOTE_RESP -> foolSerialize.deSerialize(data, FoolResponse.class);
-            default -> null;
-        });
+        Object obj = null;
+        switch (remoteType) {
+            case Constant.REMOTE_REQ:
+                obj = foolSerialize.deSerialize(data, FoolRequest.class);
+                break;
+            case Constant.REMOTE_RESP:
+                obj = foolSerialize.deSerialize(data, FoolResponse.class);
+                break;
+            default:
+                break;
+        }
+        foolProtocol.setData(obj);
         // 完成消息解码
         list.add(foolProtocol);
     }

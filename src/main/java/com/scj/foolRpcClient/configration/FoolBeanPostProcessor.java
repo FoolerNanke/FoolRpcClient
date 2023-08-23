@@ -81,13 +81,13 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                     // 获取响应结果
                     // 等待时间取自 消费注解
                     switch (annotation.consumeType()) {
-                        case SYNC -> {
+                        case SYNC:
                             // 同步等待模式
                             FoolResponse foolResponse = (FoolResponse) intercept
                                     .get(annotation.timeOut(), annotation.timeUnit());
                             return foolResponse.getData();
-                        }
-                        case CALLBACK -> {
+
+                        case CALLBACK:
                             // 异步回调模式 回调函数消费
                             String callBackMethod = annotation.CallBackMethod();
                             if (!callBackMethod.contains(".")) {
@@ -109,7 +109,7 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                                         me.invoke(bean, foolResponse);
                                     } catch (NoSuchMethodException
                                              | IllegalAccessException
-                                             | InvocationTargetException e){
+                                             | InvocationTargetException e) {
                                         // 方法不存在或者方法无法访问
                                         log.error("回调函数填写异常");
                                         throw new FoolException(ExceptionEnum.CALL_BACK_METHOD_ERROR, e);
@@ -117,10 +117,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                                 }
                             });
                             return null;
-                        }
-                        default -> {
+                        default:
                             return null;
-                        }
                     }
                 });
                 declaredField.set(bean, enhancer.create());
