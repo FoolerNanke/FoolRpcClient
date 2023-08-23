@@ -11,7 +11,6 @@ import org.springframework.context.annotation.ComponentScan;
  */
 
 @ComponentScan("com.scj.foolRpcClient")
-@EnableConfigurationProperties(FoolRpcProperties.class)
 public class FoolRpcConfigure {
 
 }
