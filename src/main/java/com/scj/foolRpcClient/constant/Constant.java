@@ -30,6 +30,11 @@ public interface Constant {
      */
     String GAP_POINT = ".";
 
+    /**
+     * 超时时间
+     */
+    long TIME_OUT = 3000;
+
     // ============= 请求类型 ================
 
     /**

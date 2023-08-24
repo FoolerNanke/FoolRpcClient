@@ -16,5 +16,6 @@ public class FoolRegisterRespHandler extends SimpleChannelInboundHandler<FoolPro
             , FoolProtocol<Object> foolProtocol) throws Exception {
         byte remoteType = foolProtocol.getRemoteType();
         // TODO
+
     }
 }

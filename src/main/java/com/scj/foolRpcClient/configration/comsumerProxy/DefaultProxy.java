@@ -44,7 +44,10 @@ public class DefaultProxy extends AbstractFoolProxy {
         通过全类名获取下游地址
          */
         String fullClassName = obj.getClass().getName().split("\\$\\$")[0];
-        InetSocketAddress rpcAddress = remoteServer.getRpcAddress(fullClassName);
+        // 获取版本
+        String version = obj.getClass().getPackage().getImplementationVersion();
+        // 从注册中心获取请求地址
+        InetSocketAddress rpcAddress = remoteServer.getRpcAddress(fullClassName, version);
         /*
         获取连接通道
          */
@@ -74,7 +77,7 @@ public class DefaultProxy extends AbstractFoolProxy {
         requestFoolProtocol.setData(foolRequest);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
-        Promise<FoolResponse> foolResponsePromise = LocalCache.handNewReq(requestFoolProtocol);
+        Promise<Object> foolResponsePromise = LocalCache.handNewReq(requestFoolProtocol);
         /*
         发送请求
          */

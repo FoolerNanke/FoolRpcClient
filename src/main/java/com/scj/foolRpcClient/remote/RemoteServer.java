@@ -14,5 +14,5 @@ public interface RemoteServer {
      * @param path 请求方全类名
      * @return 远程服务请求地址
      */
-    InetSocketAddress getRpcAddress(String path);
+    InetSocketAddress getRpcAddress(String path, String version);
 }

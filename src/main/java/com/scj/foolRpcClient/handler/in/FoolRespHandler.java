@@ -26,7 +26,7 @@ public class FoolRespHandler extends SimpleChannelInboundHandler<FoolProtocol<Fo
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
                                 FoolProtocol<FoolResponse> resp) {
-        Promise<FoolResponse> promise = LocalCache.getPromise(resp);
+        Promise<Object> promise = LocalCache.getPromise(resp);
         promise.setSuccess(resp.getData());
         ctx.fireChannelRead(resp);
     }

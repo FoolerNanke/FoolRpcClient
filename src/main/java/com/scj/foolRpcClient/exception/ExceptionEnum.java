@@ -20,6 +20,8 @@ public enum ExceptionEnum {
 
     REGISTER_ADDRESS_ERROR("REGISTER_ADDRESS_ERROR", "注册中心地址错误"),
 
+    GET_REMOTE_SERVER_ERROR("GET_REMOTE_SERVER_ERROR", "获取服务提供地址错误"),
+
     ;
 
     final String errorCode;

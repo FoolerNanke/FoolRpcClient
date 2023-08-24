@@ -2,9 +2,7 @@ package com.scj.foolRpcClient.handler.in;
 
 import com.scj.foolRpcClient.constant.LocalCache;
 import com.scj.foolRpcClient.constant.Constant;
-import com.scj.foolRpcClient.entity.FoolProtocol;
-import com.scj.foolRpcClient.entity.FoolRequest;
-import com.scj.foolRpcClient.entity.FoolResponse;
+import com.scj.foolRpcClient.entity.*;
 import com.scj.foolRpcClient.exception.ExceptionEnum;
 import com.scj.foolRpcClient.exception.FoolException;
 import com.scj.foolRpcClient.serialize.FoolSerialize;
@@ -75,6 +73,12 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
                 break;
             case Constant.REMOTE_RESP:
                 obj = foolSerialize.deSerialize(data, FoolResponse.class);
+                break;
+            case Constant.REGISTER_REQ:
+                obj = foolSerialize.deSerialize(data, FoolRegisterReq.class);
+                break;
+            case Constant.REGISTER_RESP:
+                obj = foolSerialize.deSerialize(data, FoolRegisterResp.class);
                 break;
             default:
                 break;

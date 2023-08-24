@@ -1,5 +1,7 @@
 package com.scj.foolRpcClient.annotation;
 
+import com.scj.foolRpcClient.constant.Constant;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,7 +29,7 @@ public @interface FoolRpcConsumer {
      * 超时时间
      * @return 默认超时时间数据为 3000
      */
-    long timeOut() default 3000;
+    long timeOut() default Constant.TIME_OUT;
 
     /**
      * 时间单位
