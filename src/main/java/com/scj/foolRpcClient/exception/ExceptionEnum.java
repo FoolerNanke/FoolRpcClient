@@ -8,6 +8,8 @@ package com.scj.foolRpcClient.exception;
  */
 public enum ExceptionEnum {
 
+    SUCCESS("200", "SUCCESS"),
+
     GENERATE_CLIENT_FAILED("GENERATE_CLIENT_FAILED", "建立远程链接客户端失败"),
 
     CALL_BACK_METHOD_ERROR("CALL_BACK_METHOD_ERROR", "回调函数填写异常"),

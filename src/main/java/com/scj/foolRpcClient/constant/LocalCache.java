@@ -73,7 +73,7 @@ public class LocalCache {
      * @param foolProtocol 响应
      * @return Promise<FoolResponse>
      */
-    public static Promise<Object> getPromise(FoolProtocol<FoolResponse> foolProtocol){
+    public static Promise<Object> getPromise(FoolProtocol<?> foolProtocol){
         return PromiseMap.remove(foolProtocol.getReqId());
     }
 

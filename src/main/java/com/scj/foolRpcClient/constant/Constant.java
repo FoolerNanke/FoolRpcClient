@@ -39,13 +39,20 @@ public interface Constant {
 
     /**
      * 发送给注册中心的请求
+     * 请求下游服务地址
      */
-    byte REGISTER_REQ = 1;
+    byte REGISTER_REQ_GET_IP = 1;
 
     /**
      * 来自注册中心的响应
+     * 获取响应地址
      */
-    byte REGISTER_RESP = 2;
+    byte REGISTER_RESP_IP = 2;
+
+    /**
+     * 将本地服务注册到注册中心
+     */
+    byte REGISTER_REQ_REG_CLASS = 3;
 
     /**
      * 发送给远程下游的请求

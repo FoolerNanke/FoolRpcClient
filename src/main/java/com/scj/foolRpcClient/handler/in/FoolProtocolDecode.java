@@ -74,10 +74,10 @@ public class FoolProtocolDecode extends ByteToMessageDecoder {
             case Constant.REMOTE_RESP:
                 obj = foolSerialize.deSerialize(data, FoolResponse.class);
                 break;
-            case Constant.REGISTER_REQ:
+            case Constant.REGISTER_REQ_GET_IP:
                 obj = foolSerialize.deSerialize(data, FoolRegisterReq.class);
                 break;
-            case Constant.REGISTER_RESP:
+            case Constant.REGISTER_RESP_IP:
                 obj = foolSerialize.deSerialize(data, FoolRegisterResp.class);
                 break;
             default:

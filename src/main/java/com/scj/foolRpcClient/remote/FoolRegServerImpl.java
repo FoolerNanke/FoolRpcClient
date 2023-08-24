@@ -35,7 +35,7 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
-public class RemoteServerImpl implements RemoteServer{
+public class FoolRegServerImpl implements FoolRegServer {
 
     /**
      * 注册中心链接通道
@@ -45,7 +45,7 @@ public class RemoteServerImpl implements RemoteServer{
     @Autowired
     private FoolRpcProperties foolRpcProperties;
 
-    public RemoteServerImpl() {
+    public FoolRegServerImpl() {
         String registerIp = foolRpcProperties.getRegister_ip();
         if (registerIp == null || registerIp.equals("")){
             log.error("注册中心地址未填写");
@@ -76,20 +76,9 @@ public class RemoteServerImpl implements RemoteServer{
 
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = new FoolProtocol<>();
-        reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ);
-        // 请求体
-        FoolRegisterReq foolRegisterReq = new FoolRegisterReq();
-        // 填充请求体
-        reqFoolProtocol.setData(foolRegisterReq);
-        // 填充全类名
-        foolRegisterReq.setFullClassName(path);
-        // 填充版本号
-        foolRegisterReq.setVersion(version);
-        // 填充时间戳
-        foolRegisterReq.setTimeStamp(System.currentTimeMillis());
-        // 填充应用名
-        foolRegisterReq.setAppName(foolRegisterReq.getAppName());
+        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(path, version);
+        // 填充请求类型
+        reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
         Promise<Object> foolResponsePromise = LocalCache.handNewReq(reqFoolProtocol);
@@ -109,5 +98,41 @@ public class RemoteServerImpl implements RemoteServer{
             log.error("无法获取服务提供地址");
             throw new FoolException(ExceptionEnum.GET_REMOTE_SERVER_ERROR, e);
         }
+    }
+
+    /**
+     * 将Class信息注册到注册中心
+     * @param fullClassName 全类名
+     * @param version 版本
+     */
+    @Override
+    public void registerClass(String fullClassName, String version) {
+        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(fullClassName, version);
+        // 填充请求类型
+        reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_REG_CLASS);
+        // 写入
+        channel.writeAndFlush(reqFoolProtocol);
+    }
+
+    /**
+     * 构建请求体
+     * @param path 全类名
+     * @param version 版本
+     */
+    private FoolProtocol<FoolRegisterReq> buildRegReq(String path, String version){
+        FoolProtocol<FoolRegisterReq> reqFoolProtocol = new FoolProtocol<>();
+        // 请求体
+        FoolRegisterReq foolRegisterReq = new FoolRegisterReq();
+        // 填充请求体
+        reqFoolProtocol.setData(foolRegisterReq);
+        // 填充全类名
+        foolRegisterReq.setFullClassName(path);
+        // 填充版本号
+        foolRegisterReq.setVersion(version);
+        // 填充时间戳
+        foolRegisterReq.setTimeStamp(System.currentTimeMillis());
+        // 填充应用名
+        foolRegisterReq.setAppName(foolRegisterReq.getAppName());
+        return reqFoolProtocol;
     }
 }

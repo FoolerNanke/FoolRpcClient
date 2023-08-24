@@ -5,12 +5,11 @@ import com.scj.foolRpcClient.constant.ObjectConstant;
 import com.scj.foolRpcClient.constant.Constant;
 import com.scj.foolRpcClient.entity.FoolProtocol;
 import com.scj.foolRpcClient.entity.FoolRequest;
-import com.scj.foolRpcClient.entity.FoolResponse;
 import com.scj.foolRpcClient.exception.ExceptionEnum;
 import com.scj.foolRpcClient.exception.FoolException;
 import com.scj.foolRpcClient.handler.in.FoolProtocolDecode;
 import com.scj.foolRpcClient.handler.out.FoolProtocolEncode;
-import com.scj.foolRpcClient.remote.RemoteServer;
+import com.scj.foolRpcClient.remote.FoolRegServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -36,7 +35,7 @@ import java.net.InetSocketAddress;
 public class DefaultProxy extends AbstractFoolProxy {
 
     @Autowired
-    private RemoteServer remoteServer;
+    private FoolRegServer remoteServer;
 
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws FoolException{
