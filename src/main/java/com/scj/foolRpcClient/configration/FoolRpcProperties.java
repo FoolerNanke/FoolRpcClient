@@ -18,5 +18,7 @@ import org.springframework.stereotype.Component;
 public class FoolRpcProperties {
 
     private String value;
+
+    private String register_ip;
 }
 

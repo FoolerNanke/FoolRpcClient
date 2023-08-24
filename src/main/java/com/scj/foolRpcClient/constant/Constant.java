@@ -21,6 +21,11 @@ public interface Constant {
     int NUMBER_OF_RESP_PROMISE_WORKER = 4;
 
     /**
+     * 注册中心链接处理的线程处理数量
+     */
+    int NUMBER_OF_REGISTER_WORKER = 4;
+
+    /**
      * 字符串间隔
      */
     String GAP_POINT = ".";

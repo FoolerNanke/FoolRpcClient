@@ -18,6 +18,8 @@ public enum ExceptionEnum {
 
     METHOD_NOT_EXIST("METHOD_NOT_EXIST", "请求方法不存在"),
 
+    REGISTER_ADDRESS_ERROR("REGISTER_ADDRESS_ERROR", "注册中心地址错误"),
+
     ;
 
     final String errorCode;
