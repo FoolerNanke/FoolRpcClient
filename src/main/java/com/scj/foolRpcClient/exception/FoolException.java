@@ -36,4 +36,10 @@ public class FoolException extends RuntimeException{
         this.errorMessage = exceptionEnum.getErrorMessage();
     }
 
+    public FoolException(String errorCode, String errorMessage){
+        super(errorMessage);
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
+    }
+
 }

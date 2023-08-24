@@ -35,4 +35,9 @@ public class ObjectConstant {
      * 请求回执信息处理线程池
      */
     public static final EventLoopGroup respPromiseEventLoop = new NioEventLoopGroup(Constant.NUMBER_OF_RESP_PROMISE_WORKER);
+
+    /**
+     * 注册中心处理线程池
+     */
+    public static final EventLoopGroup RegisterEventLoop = new NioEventLoopGroup(Constant.NUMBER_OF_REGISTER_WORKER);
 }

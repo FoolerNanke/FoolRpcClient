@@ -31,7 +31,7 @@ public class LocalCache {
      * key:reqId
      * value:Promise<FoolResponse>
      */
-    private static final Map<Long, Promise<FoolResponse>> PromiseMap = new ConcurrentHashMap<>();
+    private static final Map<Long, Promise<Object>> PromiseMap = new ConcurrentHashMap<>();
 
     /**
      * 服务提供方存储对象
@@ -62,8 +62,8 @@ public class LocalCache {
      * 存储请求:Promise对象
      * @param foolProtocol 存储协议
      */
-    public static Promise<FoolResponse> handNewReq(FoolProtocol<FoolRequest> foolProtocol){
-        Promise<FoolResponse> promise = new DefaultPromise<>(ObjectConstant.respPromiseEventLoop.next());
+    public static Promise<Object> handNewReq(FoolProtocol<?> foolProtocol){
+        Promise<Object> promise = new DefaultPromise<>(ObjectConstant.respPromiseEventLoop.next());
         PromiseMap.put(foolProtocol.getReqId(), promise);
         return promise;
     }
@@ -73,7 +73,7 @@ public class LocalCache {
      * @param foolProtocol 响应
      * @return Promise<FoolResponse>
      */
-    public static Promise<FoolResponse> getPromise(FoolProtocol<FoolResponse> foolProtocol){
+    public static Promise<Object> getPromise(FoolProtocol<FoolResponse> foolProtocol){
         return PromiseMap.remove(foolProtocol.getReqId());
     }
 
