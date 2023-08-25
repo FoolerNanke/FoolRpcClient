@@ -64,7 +64,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                 throw new FoolException(resp.getCode(), resp.getMessage());
             }
             // 返回下游地址
-            return new InetSocketAddress(resp.getIP(), Constant.PORT);
+            return new InetSocketAddress(resp.getIP(), Constant.REMOTE_PORT);
         } catch (InterruptedException
                  | ExecutionException
                  | TimeoutException e) {
@@ -95,17 +95,20 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
     private FoolProtocol<FoolRegisterReq> buildRegReq(String path, String version){
         FoolProtocol<FoolRegisterReq> reqFoolProtocol = new FoolProtocol<>();
         // 请求体
-        FoolRegisterReq foolRegisterReq = new FoolRegisterReq();
+        FoolRegisterReq req = new FoolRegisterReq();
         // 填充请求体
-        reqFoolProtocol.setData(foolRegisterReq);
+        reqFoolProtocol.setData(req);
         // 填充全类名
-        foolRegisterReq.setFullClassName(path);
+        req.setFullClassName(path);
         // 填充版本号
-        foolRegisterReq.setVersion(version);
+        if (version == null){
+            version = "";
+        }
+        req.setVersion(version);
         // 填充时间戳
-        foolRegisterReq.setTimeStamp(System.currentTimeMillis());
+        req.setTimeStamp(System.currentTimeMillis());
         // 填充应用名
-        foolRegisterReq.setAppName(foolRegisterReq.getAppName());
+        req.setAppName(foolRpcProperties.getAppName());
         return reqFoolProtocol;
     }
 
@@ -131,7 +134,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                                     // 响应处理器
                                     .addLast(new FoolRegisterRespHandler());
                         }
-                    }).connect(new InetSocketAddress(registerIp, Constant.PORT)).sync().channel();
+                    }).connect(new InetSocketAddress(registerIp, Constant.REGISTER_PORT)).sync().channel();
         } catch (InterruptedException e) {
             log.error("无法链接到远程服务器");
             throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
