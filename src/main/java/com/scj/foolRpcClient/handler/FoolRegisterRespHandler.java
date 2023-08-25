@@ -20,21 +20,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FoolRegisterRespHandler extends SimpleChannelInboundHandler<FoolProtocol<Object>> {
     @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext
+    protected void channelRead0(ChannelHandlerContext ctx
             , FoolProtocol<Object> foolProtocol) {
         byte remoteType = foolProtocol.getRemoteType();
         switch (remoteType){
             // 获取IP地址的请求
-            case Constant.REGISTER_RESP_IP:
+            case Constant.REGISTER_RESP_GET_IP:
                 Promise<Object> promise = LocalCache.getPromise(foolProtocol);
                 promise.setSuccess(foolProtocol.getData());
-                return;
+                ctx.fireChannelRead(foolProtocol);
+                break;
             // 注册bean
             case Constant.REGISTER_REQ_REG_CLASS:
                 FoolRegisterResp data = (FoolRegisterResp)foolProtocol.getData();
                 if (!data.getCode().equals(ExceptionEnum.SUCCESS.getErrorCode())){
                     log.error("注册异常, code:{} message:{}", data.getCode(), data.getMessage());
                 }
+                ctx.fireChannelRead(foolProtocol);
                 break;
         }
     }

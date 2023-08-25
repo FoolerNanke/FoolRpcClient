@@ -31,7 +31,7 @@ public class Provider {
                         channel.pipeline().addLast(new FoolProtocolEncode<>());
                         channel.pipeline().addLast(ObjectConstant.foolReqHandler);
                     }
-                }).bind(Constant.PORT);
+                }).bind(Constant.REMOTE_PORT);
     }
 
 }

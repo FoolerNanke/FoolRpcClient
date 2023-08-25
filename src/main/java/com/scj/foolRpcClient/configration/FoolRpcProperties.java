@@ -18,6 +18,8 @@ public class FoolRpcProperties {
 
     private String value;
 
-    private String register_ip;
+    private String register_ip = "localhost";
+
+    private String appName = "app";
 }
 
