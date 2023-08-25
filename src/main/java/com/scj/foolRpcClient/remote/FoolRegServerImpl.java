@@ -1,17 +1,17 @@
 package com.scj.foolRpcClient.remote;
 
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
-import com.scj.foolRpcClient.constant.Constant;
+import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcClient.constant.LocalCache;
 import com.scj.foolRpcClient.constant.ObjectConstant;
-import com.scj.foolRpcClient.entity.FoolProtocol;
-import com.scj.foolRpcClient.entity.FoolRegisterReq;
-import com.scj.foolRpcClient.entity.FoolRegisterResp;
-import com.scj.foolRpcClient.exception.ExceptionEnum;
-import com.scj.foolRpcClient.exception.FoolException;
-import com.scj.foolRpcClient.handler.in.FoolProtocolDecode;
-import com.scj.foolRpcClient.handler.in.FoolRegisterRespHandler;
-import com.scj.foolRpcClient.handler.out.FoolProtocolEncode;
+import com.scj.foolRpcBase.entity.FoolProtocol;
+import com.scj.foolRpcBase.entity.FoolRegisterReq;
+import com.scj.foolRpcBase.entity.FoolRegisterResp;
+import com.scj.foolRpcBase.exception.ExceptionEnum;
+import com.scj.foolRpcBase.exception.FoolException;
+import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
+import com.scj.foolRpcClient.handler.FoolRegisterRespHandler;
+import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -20,7 +20,6 @@ import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -49,6 +48,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
 
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
+        // return new InetSocketAddress("localhost", 5001);
         FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(path, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);

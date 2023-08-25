@@ -1,10 +1,10 @@
-package com.scj.foolRpcClient.handler.in;
+package com.scj.foolRpcClient.handler;
 
-import com.scj.foolRpcClient.constant.Constant;
+import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.entity.FoolProtocol;
-import com.scj.foolRpcClient.entity.FoolRegisterResp;
-import com.scj.foolRpcClient.exception.ExceptionEnum;
+import com.scj.foolRpcBase.entity.FoolProtocol;
+import com.scj.foolRpcBase.entity.FoolRegisterResp;
+import com.scj.foolRpcBase.exception.ExceptionEnum;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.concurrent.Promise;
@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FoolRegisterRespHandler extends SimpleChannelInboundHandler<FoolProtocol<Object>> {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext
-            , FoolProtocol<Object> foolProtocol) throws Exception {
+            , FoolProtocol<Object> foolProtocol) {
         byte remoteType = foolProtocol.getRemoteType();
         switch (remoteType){
             // 获取IP地址的请求

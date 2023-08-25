@@ -1,6 +1,6 @@
 package com.scj.foolRpcClient.annotation;
 
-import com.scj.foolRpcClient.constant.Constant;
+import com.scj.foolRpcBase.constant.Constant;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

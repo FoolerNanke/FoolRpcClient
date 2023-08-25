@@ -1,7 +1,8 @@
 package com.scj.foolRpcClient.constant;
 
-import com.scj.foolRpcClient.handler.in.FoolReqHandler;
-import com.scj.foolRpcClient.handler.in.FoolRespHandler;
+import com.scj.foolRpcBase.constant.Constant;
+import com.scj.foolRpcClient.handler.FoolRemoteReqHandler;
+import com.scj.foolRpcClient.handler.FoolRemoteRespHandler;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 
@@ -18,9 +19,9 @@ public class ObjectConstant {
     /**
      * 响应处理器
      */
-    public static final FoolRespHandler foolRespHandler = new FoolRespHandler();
+    public static final FoolRemoteRespHandler foolRespHandler = new FoolRemoteRespHandler();
 
-    public static final FoolReqHandler foolReqHandler = new FoolReqHandler();
+    public static final FoolRemoteReqHandler foolReqHandler = new FoolRemoteReqHandler();
 
 
     // ============ Netty EventLoop 相关常量实例 ============

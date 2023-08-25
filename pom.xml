@@ -43,6 +43,13 @@
             <artifactId>hessian</artifactId>
             <version>4.0.62</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.scj</groupId>
+            <artifactId>foolRpcBase</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -1,6 +1,6 @@
 package com.scj.foolRpcClient.testConsumer;
 
-import com.scj.foolRpcClient.entity.FoolResponse;
+import com.scj.foolRpcBase.entity.FoolResponse;
 import org.springframework.stereotype.Component;
 
 /**

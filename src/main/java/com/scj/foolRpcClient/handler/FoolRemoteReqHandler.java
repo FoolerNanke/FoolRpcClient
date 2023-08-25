@@ -1,12 +1,12 @@
-package com.scj.foolRpcClient.handler.in;
+package com.scj.foolRpcClient.handler;
 
-import com.scj.foolRpcClient.constant.Constant;
+import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.entity.FoolProtocol;
-import com.scj.foolRpcClient.entity.FoolRequest;
-import com.scj.foolRpcClient.entity.FoolResponse;
-import com.scj.foolRpcClient.exception.ExceptionEnum;
-import com.scj.foolRpcClient.exception.FoolException;
+import com.scj.foolRpcBase.entity.FoolProtocol;
+import com.scj.foolRpcBase.entity.FoolRequest;
+import com.scj.foolRpcBase.entity.FoolResponse;
+import com.scj.foolRpcBase.exception.ExceptionEnum;
+import com.scj.foolRpcBase.exception.FoolException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -24,7 +24,7 @@ import java.util.Arrays;
 
 @Slf4j
 @ChannelHandler.Sharable
-public class FoolReqHandler  extends SimpleChannelInboundHandler<FoolProtocol<FoolRequest>> {
+public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRequest>> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FoolProtocol<FoolRequest> foolRequestFoolProtocol) throws Exception {
