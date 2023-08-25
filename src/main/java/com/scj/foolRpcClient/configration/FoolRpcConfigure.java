@@ -1,6 +1,4 @@
 package com.scj.foolRpcClient.configration;
-
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
 
 /**

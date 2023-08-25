@@ -3,10 +3,11 @@ package com.scj.foolRpcClient.configration;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
 import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.entity.FoolResponse;
+import com.scj.foolRpcBase.entity.FoolResponse;
 import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
-import com.scj.foolRpcClient.exception.ExceptionEnum;
-import com.scj.foolRpcClient.exception.FoolException;
+import com.scj.foolRpcBase.exception.ExceptionEnum;
+import com.scj.foolRpcBase.exception.FoolException;
+import com.scj.foolRpcClient.remote.FoolRegServer;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
@@ -41,6 +42,9 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
     @Autowired
     private AbstractFoolProxy abstractFoolProxy;
 
+    @Autowired
+    private FoolRegServer foolRegServer;
+
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
@@ -58,6 +62,9 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                  则只会存储最后一个被扫描到的Bean
                  */
                 LocalCache.put(inter.getName(), bean);
+                // 将类信息注册到注册中心
+                foolRegServer.registerClass(inter.getName()
+                        , inter.getPackage().getImplementationVersion());
             }
         }
         /*
