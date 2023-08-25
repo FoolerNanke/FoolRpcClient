@@ -18,7 +18,9 @@ import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -35,44 +37,15 @@ import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Component
-public class FoolRegServerImpl implements FoolRegServer {
+public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
 
     /**
      * 注册中心链接通道
      */
-    private final Channel channel;
+    private Channel channel;
 
     @Autowired
     private FoolRpcProperties foolRpcProperties;
-
-    public FoolRegServerImpl() {
-        String registerIp = foolRpcProperties.getRegister_ip();
-        if (registerIp == null || registerIp.equals("")){
-            log.error("注册中心地址未填写");
-            throw new FoolException(ExceptionEnum.REGISTER_ADDRESS_ERROR);
-        }
-        try {
-            channel = new Bootstrap()
-                    .group(ObjectConstant.RegisterEventLoop)
-                    .channel(NioSocketChannel.class)
-                    .handler(new ChannelInitializer<NioSocketChannel>() {
-                        @Override
-                        protected void initChannel(NioSocketChannel channel) {
-                            channel.pipeline()
-                                // 编码器
-                                .addLast(new FoolProtocolEncode<>())
-                                // 解码器
-                                .addLast(new FoolProtocolDecode())
-                                // 响应处理器
-                                .addLast(new FoolRegisterRespHandler());
-                        }
-                    }).connect(new InetSocketAddress(registerIp, Constant.PORT)).sync().channel();
-        } catch (InterruptedException e) {
-            log.error("无法链接到远程服务器");
-            throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
-        }
-
-    }
 
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
@@ -134,5 +107,34 @@ public class FoolRegServerImpl implements FoolRegServer {
         // 填充应用名
         foolRegisterReq.setAppName(foolRegisterReq.getAppName());
         return reqFoolProtocol;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        String registerIp = foolRpcProperties.getRegister_ip();
+        if (registerIp == null || registerIp.equals("")){
+            log.error("注册中心地址未填写");
+            throw new FoolException(ExceptionEnum.REGISTER_ADDRESS_ERROR);
+        }
+        try {
+            channel = new Bootstrap()
+                    .group(ObjectConstant.RegisterEventLoop)
+                    .channel(NioSocketChannel.class)
+                    .handler(new ChannelInitializer<NioSocketChannel>() {
+                        @Override
+                        protected void initChannel(NioSocketChannel channel) {
+                            channel.pipeline()
+                                    // 编码器
+                                    .addLast(new FoolProtocolEncode<>())
+                                    // 解码器
+                                    .addLast(new FoolProtocolDecode())
+                                    // 响应处理器
+                                    .addLast(new FoolRegisterRespHandler());
+                        }
+                    }).connect(new InetSocketAddress(registerIp, Constant.PORT)).sync().channel();
+        } catch (InterruptedException e) {
+            log.error("无法链接到远程服务器");
+            throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
+        }
     }
 }
