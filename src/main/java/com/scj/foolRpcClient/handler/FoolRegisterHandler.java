@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class FoolRegisterRespHandler extends SimpleChannelInboundHandler<FoolProtocol<Object>> {
+public class FoolRegisterHandler extends SimpleChannelInboundHandler<FoolProtocol<Object>> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx
             , FoolProtocol<Object> foolProtocol) {
@@ -36,6 +36,16 @@ public class FoolRegisterRespHandler extends SimpleChannelInboundHandler<FoolPro
                 if (!data.getCode().equals(ExceptionEnum.SUCCESS.getErrorCode())){
                     log.error("注册异常, code:{} message:{}", data.getCode(), data.getMessage());
                 }
+                ctx.fireChannelRead(foolProtocol);
+                break;
+            // 注册中心发出的心跳检测请求
+            case Constant.REGISTER_PING_REQ:
+                FoolProtocol<FoolRegisterResp> respFoolProtocol = new FoolProtocol<>();
+                respFoolProtocol.setRemoteType(Constant.REGISTER_PONG_RESP);
+                respFoolProtocol.setReqId(foolProtocol.getReqId());
+                respFoolProtocol.setData(new FoolRegisterResp());
+                log.info("收到心跳请求 reqId = {}", foolProtocol.getReqId());
+                ctx.writeAndFlush(respFoolProtocol);
                 ctx.fireChannelRead(foolProtocol);
                 break;
         }

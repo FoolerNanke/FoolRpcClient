@@ -10,7 +10,7 @@ import com.scj.foolRpcBase.entity.FoolRegisterResp;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
-import com.scj.foolRpcClient.handler.FoolRegisterRespHandler;
+import com.scj.foolRpcClient.handler.FoolRegisterHandler;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -58,7 +58,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
         // 写入
         channel.writeAndFlush(reqFoolProtocol);
         try {
-            FoolRegisterResp resp = (FoolRegisterResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MICROSECONDS);
+            FoolRegisterResp resp = (FoolRegisterResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
             if (resp.getIP() == null || resp.getIP().equals("")){
                 log.error("无法获取服务提供地址");
                 throw new FoolException(resp.getCode(), resp.getMessage());
@@ -132,7 +132,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                                     // 解码器
                                     .addLast(new FoolProtocolDecode())
                                     // 响应处理器
-                                    .addLast(new FoolRegisterRespHandler());
+                                    .addLast(new FoolRegisterHandler());
                         }
                     }).connect(new InetSocketAddress(registerIp, Constant.REGISTER_PORT)).sync().channel();
         } catch (InterruptedException e) {
