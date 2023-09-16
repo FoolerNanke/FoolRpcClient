@@ -13,7 +13,9 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,28 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class DefaultProvider implements ProviderService{
-
-    @Getter
-    private static final class ProvideBean{
-        /**
-         * 实例
-         */
-        private final Object bean;
-        /**
-         * 版本
-         */
-        private final String version;
-        /**
-         * 实例名
-         */
-        private final String beanName;
-
-        public ProvideBean(Object bean, String version, String beanName) {
-            this.bean = bean;
-            this.version = version;
-            this.beanName = beanName;
-        }
-    }
 
     @Autowired
     private FoolRemoteReqHandler foolRemoteReqHandler;
@@ -85,5 +65,10 @@ public class DefaultProvider implements ProviderService{
             return provideBean.getBean();
         }
         return null;
+    }
+
+    @Override
+    public Collection<ProvideBean> getAllBean() {
+        return ProviderMap.values();
     }
 }

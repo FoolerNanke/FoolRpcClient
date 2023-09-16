@@ -34,5 +34,7 @@ public class ClientPingPongHandler extends PingPongHandler {
                 .getBeanByClazz(FoolRegServer.class);
         // 尝试重新连接
         foolRegServer.connect();
+        // 重新注册
+        foolRegServer.registerAgain();
     }
 }

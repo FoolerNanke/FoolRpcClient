@@ -6,6 +6,7 @@ import com.scj.foolRpcBase.entity.FoolCommonResp;
 import com.scj.foolRpcBase.handler.in.AddTimeHandler;
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
 import com.scj.foolRpcBase.constant.Constant;
+import com.scj.foolRpcClient.configration.providerServer.ProviderService;
 import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcBase.entity.FoolProtocol;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
@@ -25,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -47,6 +50,9 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
 
     @Autowired
     private FoolRpcProperties foolRpcProperties;
+
+    @Autowired
+    private ProviderService providerService;
 
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
@@ -146,6 +152,14 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
         } catch (InterruptedException e) {
             log.error("无法链接到远程服务器");
             throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
+        }
+    }
+
+    @Override
+    public void registerAgain() {
+        Collection<ProviderService.ProvideBean> beanNames = providerService.getAllBean();
+        for (ProviderService.ProvideBean provideBean : beanNames) {
+            this.registerClass(provideBean.getBeanName(), provideBean.getVersion());
         }
     }
 

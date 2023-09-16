@@ -1,5 +1,10 @@
 package com.scj.foolRpcClient.configration.providerServer;
 
+import lombok.Getter;
+
+import java.util.Collection;
+import java.util.Set;
+
 /**
  * @author suchangjie.NANKE
  * @Title: LocalCache
@@ -7,6 +12,28 @@ package com.scj.foolRpcClient.configration.providerServer;
  * @description 本地缓存
  */
 public interface ProviderService {
+
+    @Getter
+    final class ProvideBean{
+        /**
+         * 实例
+         */
+        private final Object bean;
+        /**
+         * 版本
+         */
+        private final String version;
+        /**
+         * 实例名
+         */
+        private final String beanName;
+
+        public ProvideBean(Object bean, String version, String beanName) {
+            this.bean = bean;
+            this.version = version;
+            this.beanName = beanName;
+        }
+    }
 
     /**
      * 新增响应实例
@@ -22,4 +49,10 @@ public interface ProviderService {
      * @return Object->Bean
      */
     Object get(String name);
+
+    /**
+     * 获取所有对外提供服务的bean
+     * @return bean set
+     */
+    Collection<ProvideBean> getAllBean();
 }
