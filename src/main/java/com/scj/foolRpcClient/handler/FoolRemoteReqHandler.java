@@ -1,37 +1,43 @@
 package com.scj.foolRpcClient.handler;
 
 import com.scj.foolRpcBase.constant.Constant;
-import com.scj.foolRpcClient.constant.LocalCache;
+import com.scj.foolRpcBase.entity.FoolRemoteReq;
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
+import com.scj.foolRpcClient.configration.providerServer.ProviderService;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolRequest;
-import com.scj.foolRpcBase.entity.FoolResponse;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**
  * @author suchangjie.NANKE
- * @Title: FoolReqHandler
+ * @Title: FoolRemoteReqHandler
  * @date 2023/8/21 21:44
  * @description 请求处理器
  */
 
 @Slf4j
 @ChannelHandler.Sharable
-public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRequest>> {
+@Component
+public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRemoteReq>> {
+
+    @Autowired
+    private ProviderService providerService;
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FoolProtocol<FoolRequest> foolRequestFoolProtocol) throws Exception {
-        FoolRequest request = foolRequestFoolProtocol.getData();
+    protected void channelRead0(ChannelHandlerContext ctx, FoolProtocol<FoolRemoteReq> protocol) throws Exception {
+        FoolRemoteReq request = protocol.getData();
         // 根据请求携带全类名数据
         // 获取处理该请求的实例
-        Object bean = LocalCache.get(request.getFullClassName());
+        Object bean = providerService.get(request.getFullClassName());
         // 获取请求携带的入参
         String[] argsType = request.getArgsType();
         Method method = null;
@@ -53,15 +59,16 @@ public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtoc
         // 调用方法
         Object invoke = method.invoke(bean, request.getArgs());
         // 填充响应基本信息
-        FoolProtocol<FoolResponse> responseFoolProtocol = new FoolProtocol<>();
-        responseFoolProtocol.setReqId(foolRequestFoolProtocol.getReqId());
+        FoolProtocol<FoolRemoteResp> responseFoolProtocol = new FoolProtocol<>();
+        responseFoolProtocol.setReqId(protocol.getReqId());
         responseFoolProtocol.setRemoteType(Constant.REMOTE_RESP);
-        FoolResponse response = new FoolResponse();
+        FoolRemoteResp response = new FoolRemoteResp();
         responseFoolProtocol.setData(response);
         // 填充响应数据信息
         response.setFullClassName(method.getReturnType().getName());
         response.setData(invoke);
         ctx.writeAndFlush(responseFoolProtocol);
+        ctx.fireChannelRead(protocol);
     }
 
     /**

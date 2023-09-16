@@ -1,6 +1,6 @@
 package com.scj.foolRpcClient.testConsumer;
 
-import com.scj.foolRpcBase.entity.FoolResponse;
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CallBack {
 
-    public void callBack1(FoolResponse foolResponse){
+    public void callBack1(FoolRemoteResp foolResponse){
         System.out.println(foolResponse.getFullClassName());
     }
 }

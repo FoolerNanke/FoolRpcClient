@@ -1,9 +1,9 @@
 package com.scj.foolRpcClient.configration;
 
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
-import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcBase.entity.FoolResponse;
+import com.scj.foolRpcClient.configration.providerServer.ProviderService;
 import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
@@ -45,6 +45,9 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
     @Autowired
     private FoolRegServer foolRegServer;
 
+    @Autowired
+    private ProviderService providerService;
+
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
@@ -61,7 +64,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                  如果一个接口存在多个实现 且均被 @FoolRpcProvider 修饰
                  则只会存储最后一个被扫描到的Bean
                  */
-                LocalCache.put(inter.getName(), bean);
+                providerService.put(inter.getName(), bean,
+                        inter.getPackage().getImplementationVersion());
                 // 将类信息注册到注册中心
                 foolRegServer.registerClass(inter.getName()
                         , inter.getPackage().getImplementationVersion());
@@ -90,7 +94,7 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                     switch (annotation.consumeType()) {
                         case SYNC:
                             // 同步等待模式
-                            FoolResponse foolResponse = (FoolResponse) intercept
+                            FoolRemoteResp foolResponse = (FoolRemoteResp) intercept
                                     .get(annotation.timeOut(), annotation.timeUnit());
                             return foolResponse.getData();
 
@@ -107,11 +111,11 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                             intercept.addListener(new FutureListener<Object>() {
                                 @Override
                                 public void operationComplete(Future<Object> future) throws ExecutionException, InterruptedException {
-                                    FoolResponse foolResponse = (FoolResponse) future.get();
+                                    FoolRemoteResp foolResponse = (FoolRemoteResp) future.get();
                                     String[] split = callBackMethod.split("\\.");
                                     Object bean = SpringContextUtil.getBeanByName(split[0]);
                                     try {
-                                        Method me = bean.getClass().getMethod(split[1], FoolResponse.class);
+                                        Method me = bean.getClass().getMethod(split[1], FoolRemoteResp.class);
                                         me.setAccessible(true);
                                         me.invoke(bean, foolResponse);
                                     } catch (NoSuchMethodException

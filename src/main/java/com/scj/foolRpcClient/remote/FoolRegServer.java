@@ -16,5 +16,21 @@ public interface FoolRegServer {
      */
     InetSocketAddress getRpcAddress(String path, String version);
 
+    /**
+     * 注册bean到注册中心
+     * @param fullClassName 全类名
+     * @param version 版本
+     */
     void registerClass(String fullClassName, String version);
+
+    /**
+     * 重新连接到注册中心后
+     * 再次将所有的bean注册上去
+     */
+    void registerAgain();
+
+    /**
+     * 连接到注册中心
+     */
+    void connect();
 }

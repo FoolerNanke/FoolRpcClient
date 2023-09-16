@@ -7,11 +7,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class FRCApplication {
-
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(FRCApplication.class, args);
          Consumer consumer = run.getBean("consumer", Consumer.class);
          consumer.get();
     }
-
 }

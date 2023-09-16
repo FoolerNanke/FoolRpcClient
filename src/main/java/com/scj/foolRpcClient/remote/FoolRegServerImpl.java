@@ -1,15 +1,18 @@
 package com.scj.foolRpcClient.remote;
 
+import com.scj.foolRpcBase.constant.RespCache;
+import com.scj.foolRpcBase.entity.FoolCommonReq;
+import com.scj.foolRpcBase.entity.FoolCommonResp;
+import com.scj.foolRpcBase.handler.in.AddTimeHandler;
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
 import com.scj.foolRpcBase.constant.Constant;
-import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.constant.ObjectConstant;
+import com.scj.foolRpcClient.configration.providerServer.ProviderService;
+import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolRegisterReq;
-import com.scj.foolRpcBase.entity.FoolRegisterResp;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
+import com.scj.foolRpcClient.handler.ClientPingPongHandler;
 import com.scj.foolRpcClient.handler.FoolRegisterHandler;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.Bootstrap;
@@ -23,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,19 +51,22 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
     @Autowired
     private FoolRpcProperties foolRpcProperties;
 
+    @Autowired
+    private ProviderService providerService;
+
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
         // return new InetSocketAddress("localhost", 5001);
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(path, version);
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = buildRegReq(path, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
-        Promise<Object> foolResponsePromise = LocalCache.handNewReq(reqFoolProtocol);
+        Promise<Object> foolResponsePromise = RespCache.handNewReq(reqFoolProtocol);
         // 写入
         channel.writeAndFlush(reqFoolProtocol);
         try {
-            FoolRegisterResp resp = (FoolRegisterResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
+            FoolCommonResp resp = (FoolCommonResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
             if (resp.getIP() == null || resp.getIP().equals("")){
                 log.error("无法获取服务提供地址");
                 throw new FoolException(resp.getCode(), resp.getMessage());
@@ -80,7 +88,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
      */
     @Override
     public void registerClass(String fullClassName, String version) {
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(fullClassName, version);
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = buildRegReq(fullClassName, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_REG_CLASS);
         // 写入
@@ -92,10 +100,10 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
      * @param path 全类名
      * @param version 版本
      */
-    private FoolProtocol<FoolRegisterReq> buildRegReq(String path, String version){
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = new FoolProtocol<>();
+    private FoolProtocol<FoolCommonReq> buildRegReq(String path, String version){
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = new FoolProtocol<>();
         // 请求体
-        FoolRegisterReq req = new FoolRegisterReq();
+        FoolCommonReq req = new FoolCommonReq();
         // 填充请求体
         reqFoolProtocol.setData(req);
         // 填充全类名
@@ -113,15 +121,15 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() {
+    public void connect() {
         String registerIp = foolRpcProperties.getRegister_ip();
-        if (registerIp == null || registerIp.equals("")){
+        if (registerIp == null || registerIp.isEmpty()){
             log.error("注册中心地址未填写");
             throw new FoolException(ExceptionEnum.REGISTER_ADDRESS_ERROR);
         }
         try {
             channel = new Bootstrap()
-                    .group(ObjectConstant.RegisterEventLoop)
+                    .group(FRCConstant.RegisterEventLoop)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
@@ -132,12 +140,31 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                                     // 解码器
                                     .addLast(new FoolProtocolDecode())
                                     // 响应处理器
-                                    .addLast(new FoolRegisterHandler());
+                                    .addLast(new FoolRegisterHandler())
+                                    // 响应结果处理器
+                                    .addLast(FRCConstant.foolRespHandler)
+                                    // 心跳加时处理器
+                                    .addLast(new AddTimeHandler());
                         }
                     }).connect(new InetSocketAddress(registerIp, Constant.REGISTER_PORT)).sync().channel();
+            // 通道初始化成功 加入心跳检测
+            ClientPingPongHandler.addPingPong(channel);
         } catch (InterruptedException e) {
             log.error("无法链接到远程服务器");
             throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
         }
+    }
+
+    @Override
+    public void registerAgain() {
+        Collection<ProviderService.ProvideBean> beanNames = providerService.getAllBean();
+        for (ProviderService.ProvideBean provideBean : beanNames) {
+            this.registerClass(provideBean.getBeanName(), provideBean.getVersion());
+        }
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        connect();
     }
 }
