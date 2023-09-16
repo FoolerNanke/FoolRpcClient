@@ -1,14 +1,14 @@
 package com.scj.foolRpcClient.configration.comsumerProxy;
 
 import com.scj.foolRpcBase.constant.Constant;
+import com.scj.foolRpcBase.constant.RespCache;
 import com.scj.foolRpcBase.entity.FoolProtocol;
 import com.scj.foolRpcBase.entity.FoolRemoteReq;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
-import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.constant.ObjectConstant;
+import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcClient.remote.FoolRegServer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
@@ -76,7 +76,7 @@ public class DefaultProxy extends AbstractFoolProxy {
         requestFoolProtocol.setData(FoolRemoteReq);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
-        Promise<Object> foolResponsePromise = LocalCache.handNewReq(requestFoolProtocol);
+        Promise<Object> foolResponsePromise = RespCache.handNewReq(requestFoolProtocol);
         /*
         发送请求
          */
@@ -88,10 +88,10 @@ public class DefaultProxy extends AbstractFoolProxy {
      * @param address 远程请求地址
      * @return 远程请求客户端
      */
-    public Channel getClientChannel(InetSocketAddress address) {
+    private Channel getClientChannel(InetSocketAddress address) {
         try {
             return new Bootstrap()
-                    .group(ObjectConstant.reqEventLoop)
+                    .group(FRCConstant.reqEventLoop)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
@@ -99,7 +99,7 @@ public class DefaultProxy extends AbstractFoolProxy {
                             channel.pipeline()
                                     .addLast(new FoolProtocolEncode<>())
                                     .addLast(new FoolProtocolDecode())
-                                    .addLast(ObjectConstant.foolRespHandler);
+                                    .addLast(FRCConstant.foolRespHandler);
                         }
                     }).connect(address).sync().channel();
         } catch (InterruptedException e) {

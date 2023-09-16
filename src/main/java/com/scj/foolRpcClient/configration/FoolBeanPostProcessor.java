@@ -3,8 +3,7 @@ package com.scj.foolRpcClient.configration;
 import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
-import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcBase.entity.FoolCommonResp;
+import com.scj.foolRpcClient.configration.providerServer.ProviderService;
 import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
@@ -46,6 +45,9 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
     @Autowired
     private FoolRegServer foolRegServer;
 
+    @Autowired
+    private ProviderService providerService;
+
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         Class<?> clazz = bean.getClass();
@@ -62,7 +64,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                  如果一个接口存在多个实现 且均被 @FoolRpcProvider 修饰
                  则只会存储最后一个被扫描到的Bean
                  */
-                LocalCache.put(inter.getName(), bean);
+                providerService.put(inter.getName(), bean,
+                        inter.getPackage().getImplementationVersion());
                 // 将类信息注册到注册中心
                 foolRegServer.registerClass(inter.getName()
                         , inter.getPackage().getImplementationVersion());

@@ -1,15 +1,17 @@
 package com.scj.foolRpcClient.remote;
 
+import com.scj.foolRpcBase.constant.RespCache;
 import com.scj.foolRpcBase.entity.FoolCommonReq;
 import com.scj.foolRpcBase.entity.FoolCommonResp;
+import com.scj.foolRpcBase.handler.in.AddTimeHandler;
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
 import com.scj.foolRpcBase.constant.Constant;
-import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcClient.constant.ObjectConstant;
+import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcBase.entity.FoolProtocol;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
+import com.scj.foolRpcClient.handler.ClientPingPongHandler;
 import com.scj.foolRpcClient.handler.FoolRegisterHandler;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.Bootstrap;
@@ -54,7 +56,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
-        Promise<Object> foolResponsePromise = LocalCache.handNewReq(reqFoolProtocol);
+        Promise<Object> foolResponsePromise = RespCache.handNewReq(reqFoolProtocol);
         // 写入
         channel.writeAndFlush(reqFoolProtocol);
         try {
@@ -113,15 +115,15 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() {
+    public void connect() {
         String registerIp = foolRpcProperties.getRegister_ip();
-        if (registerIp == null || registerIp.equals("")){
+        if (registerIp == null || registerIp.isEmpty()){
             log.error("注册中心地址未填写");
             throw new FoolException(ExceptionEnum.REGISTER_ADDRESS_ERROR);
         }
         try {
             channel = new Bootstrap()
-                    .group(ObjectConstant.RegisterEventLoop)
+                    .group(FRCConstant.RegisterEventLoop)
                     .channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<NioSocketChannel>() {
                         @Override
@@ -132,12 +134,23 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                                     // 解码器
                                     .addLast(new FoolProtocolDecode())
                                     // 响应处理器
-                                    .addLast(new FoolRegisterHandler());
+                                    .addLast(new FoolRegisterHandler())
+                                    // 响应结果处理器
+                                    .addLast(FRCConstant.foolRespHandler)
+                                    // 心跳加时处理器
+                                    .addLast(new AddTimeHandler());
                         }
                     }).connect(new InetSocketAddress(registerIp, Constant.REGISTER_PORT)).sync().channel();
+            // 通道初始化成功 加入心跳检测
+            ClientPingPongHandler.addPingPong(channel);
         } catch (InterruptedException e) {
             log.error("无法链接到远程服务器");
             throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
         }
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        connect();
     }
 }

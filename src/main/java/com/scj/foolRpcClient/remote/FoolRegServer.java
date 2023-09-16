@@ -17,4 +17,9 @@ public interface FoolRegServer {
     InetSocketAddress getRpcAddress(String path, String version);
 
     void registerClass(String fullClassName, String version);
+
+    /**
+     * 连接到注册中心
+     */
+    void connect();
 }
