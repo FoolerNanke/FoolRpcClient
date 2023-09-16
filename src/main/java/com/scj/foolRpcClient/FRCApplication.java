@@ -13,5 +13,4 @@ public class FRCApplication {
          Consumer consumer = run.getBean("consumer", Consumer.class);
          consumer.get();
     }
-
 }

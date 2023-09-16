@@ -1,8 +1,8 @@
 package com.scj.foolRpcClient.handler;
 
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.constant.LocalCache;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolResponse;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -16,7 +16,7 @@ import io.netty.util.concurrent.Promise;
  */
 
 @ChannelHandler.Sharable
-public class FoolRemoteRespHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolResponse>> {
+public class FoolRemoteRespHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRemoteResp>> {
 
     /**
      * 设置返回值
@@ -25,7 +25,7 @@ public class FoolRemoteRespHandler extends SimpleChannelInboundHandler<FoolProto
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx,
-                                FoolProtocol<FoolResponse> resp) {
+                                FoolProtocol<FoolRemoteResp> resp) {
         Promise<Object> promise = LocalCache.getPromise(resp);
         promise.setSuccess(resp.getData());
         ctx.fireChannelRead(resp);

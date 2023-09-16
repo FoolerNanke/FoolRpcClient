@@ -1,9 +1,10 @@
 package com.scj.foolRpcClient.configration;
 
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
 import com.scj.foolRpcClient.constant.LocalCache;
-import com.scj.foolRpcBase.entity.FoolResponse;
+import com.scj.foolRpcBase.entity.FoolCommonResp;
 import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
@@ -90,7 +91,7 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                     switch (annotation.consumeType()) {
                         case SYNC:
                             // 同步等待模式
-                            FoolResponse foolResponse = (FoolResponse) intercept
+                            FoolRemoteResp foolResponse = (FoolRemoteResp) intercept
                                     .get(annotation.timeOut(), annotation.timeUnit());
                             return foolResponse.getData();
 
@@ -107,11 +108,11 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                             intercept.addListener(new FutureListener<Object>() {
                                 @Override
                                 public void operationComplete(Future<Object> future) throws ExecutionException, InterruptedException {
-                                    FoolResponse foolResponse = (FoolResponse) future.get();
+                                    FoolRemoteResp foolResponse = (FoolRemoteResp) future.get();
                                     String[] split = callBackMethod.split("\\.");
                                     Object bean = SpringContextUtil.getBeanByName(split[0]);
                                     try {
-                                        Method me = bean.getClass().getMethod(split[1], FoolResponse.class);
+                                        Method me = bean.getClass().getMethod(split[1], FoolRemoteResp.class);
                                         me.setAccessible(true);
                                         me.invoke(bean, foolResponse);
                                     } catch (NoSuchMethodException

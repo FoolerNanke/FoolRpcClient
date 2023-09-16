@@ -1,10 +1,10 @@
 package com.scj.foolRpcClient.handler;
 
 import com.scj.foolRpcBase.constant.Constant;
+import com.scj.foolRpcBase.entity.FoolRemoteReq;
+import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.constant.LocalCache;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolRequest;
-import com.scj.foolRpcBase.entity.FoolResponse;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import io.netty.channel.ChannelHandler;
@@ -24,11 +24,11 @@ import java.util.Arrays;
 
 @Slf4j
 @ChannelHandler.Sharable
-public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRequest>> {
+public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtocol<FoolRemoteReq>> {
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, FoolProtocol<FoolRequest> foolRequestFoolProtocol) throws Exception {
-        FoolRequest request = foolRequestFoolProtocol.getData();
+    protected void channelRead0(ChannelHandlerContext ctx, FoolProtocol<FoolRemoteReq> foolRequestFoolProtocol) throws Exception {
+        FoolRemoteReq request = foolRequestFoolProtocol.getData();
         // 根据请求携带全类名数据
         // 获取处理该请求的实例
         Object bean = LocalCache.get(request.getFullClassName());
@@ -53,10 +53,10 @@ public class FoolRemoteReqHandler extends SimpleChannelInboundHandler<FoolProtoc
         // 调用方法
         Object invoke = method.invoke(bean, request.getArgs());
         // 填充响应基本信息
-        FoolProtocol<FoolResponse> responseFoolProtocol = new FoolProtocol<>();
+        FoolProtocol<FoolRemoteResp> responseFoolProtocol = new FoolProtocol<>();
         responseFoolProtocol.setReqId(foolRequestFoolProtocol.getReqId());
         responseFoolProtocol.setRemoteType(Constant.REMOTE_RESP);
-        FoolResponse response = new FoolResponse();
+        FoolRemoteResp response = new FoolRemoteResp();
         responseFoolProtocol.setData(response);
         // 填充响应数据信息
         response.setFullClassName(method.getReturnType().getName());

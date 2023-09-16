@@ -1,12 +1,12 @@
 package com.scj.foolRpcClient.remote;
 
+import com.scj.foolRpcBase.entity.FoolCommonReq;
+import com.scj.foolRpcBase.entity.FoolCommonResp;
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
 import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcClient.constant.LocalCache;
 import com.scj.foolRpcClient.constant.ObjectConstant;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolRegisterReq;
-import com.scj.foolRpcBase.entity.FoolRegisterResp;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
@@ -49,7 +49,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
         // return new InetSocketAddress("localhost", 5001);
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(path, version);
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = buildRegReq(path, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);
         // 根据该请求存储对应的Promise对象
@@ -58,7 +58,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
         // 写入
         channel.writeAndFlush(reqFoolProtocol);
         try {
-            FoolRegisterResp resp = (FoolRegisterResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
+            FoolCommonResp resp = (FoolCommonResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
             if (resp.getIP() == null || resp.getIP().equals("")){
                 log.error("无法获取服务提供地址");
                 throw new FoolException(resp.getCode(), resp.getMessage());
@@ -80,7 +80,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
      */
     @Override
     public void registerClass(String fullClassName, String version) {
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = buildRegReq(fullClassName, version);
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = buildRegReq(fullClassName, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_REG_CLASS);
         // 写入
@@ -92,10 +92,10 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
      * @param path 全类名
      * @param version 版本
      */
-    private FoolProtocol<FoolRegisterReq> buildRegReq(String path, String version){
-        FoolProtocol<FoolRegisterReq> reqFoolProtocol = new FoolProtocol<>();
+    private FoolProtocol<FoolCommonReq> buildRegReq(String path, String version){
+        FoolProtocol<FoolCommonReq> reqFoolProtocol = new FoolProtocol<>();
         // 请求体
-        FoolRegisterReq req = new FoolRegisterReq();
+        FoolCommonReq req = new FoolCommonReq();
         // 填充请求体
         reqFoolProtocol.setData(req);
         // 填充全类名

@@ -2,7 +2,7 @@ package com.scj.foolRpcClient.configration.comsumerProxy;
 
 import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcBase.entity.FoolProtocol;
-import com.scj.foolRpcBase.entity.FoolRequest;
+import com.scj.foolRpcBase.entity.FoolRemoteReq;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
@@ -55,25 +55,25 @@ public class DefaultProxy extends AbstractFoolProxy {
         构建请求
          */
         // 基础信息填充
-        FoolProtocol<FoolRequest> requestFoolProtocol = new FoolProtocol<>();
+        FoolProtocol<FoolRemoteReq> requestFoolProtocol = new FoolProtocol<>();
         // 设置请求类型
         requestFoolProtocol.setRemoteType(Constant.REMOTE_REQ);
         // 设置请求体
-        FoolRequest foolRequest = new FoolRequest();
+        FoolRemoteReq FoolRemoteReq = new FoolRemoteReq();
         // 填充请求参数
-        foolRequest.setArgs(args);
+        FoolRemoteReq.setArgs(args);
         // 填充参数类型
         String[] argsType = new String[args.length];
         for (int i = 0; i < argsType.length; i++) {
             argsType[i] = method.getParameterTypes()[i].getName();
         }
-        foolRequest.setArgsType(argsType);
+        FoolRemoteReq.setArgsType(argsType);
         // 填充全类名
-        foolRequest.setFullClassName(fullClassName);
+        FoolRemoteReq.setFullClassName(fullClassName);
         // 填充方法
-        foolRequest.setMethodName(method.getName());
+        FoolRemoteReq.setMethodName(method.getName());
         // 将请求体填充进FoolProtocol中
-        requestFoolProtocol.setData(foolRequest);
+        requestFoolProtocol.setData(FoolRemoteReq);
         // 根据该请求存储对应的Promise对象
         // 该Promise对象将用来存储响应返回值
         Promise<Object> foolResponsePromise = LocalCache.handNewReq(requestFoolProtocol);

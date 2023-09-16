@@ -1,5 +1,6 @@
 package com.scj.foolRpcClient.configration;
 
+import lombok.Getter;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -19,15 +20,12 @@ public class SpringContextUtil implements ApplicationContextAware {
     /**
      * 托管容器
      */
+    @Getter
     private static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         SpringContextUtil.applicationContext = applicationContext;
-    }
-
-    public static ApplicationContext getApplicationContext(){
-        return applicationContext;
     }
 
     /**
