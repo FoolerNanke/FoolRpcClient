@@ -53,12 +53,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-<!--                <configuration>-->
-<!--                    <excludes>-->
-<!--                        <exclude>**/testConsumer/**</exclude>-->
-<!--                        <exclude>**/FRCApplication.java</exclude>-->
-<!--                    </excludes>-->
-<!--                </configuration>-->
+                <configuration>
+                    <excludes>
+                        <exclude>**/FRCApplication.java</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
         <resources>

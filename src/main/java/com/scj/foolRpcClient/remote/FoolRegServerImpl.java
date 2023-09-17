@@ -4,6 +4,7 @@ import com.scj.foolRpcBase.constant.RespCache;
 import com.scj.foolRpcBase.entity.FoolCommonReq;
 import com.scj.foolRpcBase.entity.FoolCommonResp;
 import com.scj.foolRpcBase.handler.in.AddTimeHandler;
+import com.scj.foolRpcBase.handler.in.PingPongReqHandler;
 import com.scj.foolRpcClient.configration.FoolRpcProperties;
 import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcClient.configration.providerServer.ProviderService;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -67,7 +67,7 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
         channel.writeAndFlush(reqFoolProtocol);
         try {
             FoolCommonResp resp = (FoolCommonResp)foolResponsePromise.get(Constant.TIME_OUT, TimeUnit.MILLISECONDS);
-            if (resp.getIP() == null || resp.getIP().equals("")){
+            if (resp.getIP() == null || resp.getIP().isEmpty()){
                 log.error("无法获取服务提供地址");
                 throw new FoolException(resp.getCode(), resp.getMessage());
             }
@@ -135,20 +135,22 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
                         @Override
                         protected void initChannel(NioSocketChannel channel) {
                             channel.pipeline()
-                                    // 编码器
-                                    .addLast(new FoolProtocolEncode<>())
-                                    // 解码器
-                                    .addLast(new FoolProtocolDecode())
-                                    // 响应处理器
-                                    .addLast(new FoolRegisterHandler())
-                                    // 响应结果处理器
-                                    .addLast(FRCConstant.foolRespHandler)
-                                    // 心跳加时处理器
-                                    .addLast(new AddTimeHandler());
+                                // 编码器
+                                .addLast(new FoolProtocolEncode<>())
+                                // 解码器
+                                .addLast(new FoolProtocolDecode())
+                                // 响应处理器
+                                .addLast(new FoolRegisterHandler())
+                                // 心跳请求处理器
+                                .addLast(new PingPongReqHandler())
+                                // 响应结果处理器
+                                .addLast(FRCConstant.foolRespHandler)
+                                // 心跳加时处理器
+                                .addLast(new AddTimeHandler());
                         }
                     }).connect(new InetSocketAddress(registerIp, Constant.REGISTER_PORT)).sync().channel();
             // 通道初始化成功 加入心跳检测
-            ClientPingPongHandler.addPingPong(channel);
+            ClientPingPongHandler.addPingPong(channel, true);
         } catch (InterruptedException e) {
             log.error("无法链接到远程服务器");
             throw new FoolException(ExceptionEnum.GENERATE_CLIENT_FAILED, e);
