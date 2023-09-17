@@ -4,7 +4,7 @@ import java.net.InetSocketAddress;
 
 /**
  * @author suchangjie.NANKE
- * @Title: RemoteServer
+ * @Title: FoolRegServer
  * @date 2023/8/12 23:08
  * @description 链接注册中心的接口
  */

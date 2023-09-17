@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author suchangjie.NANKE
- * @Title: RemoteServerImpl
+ * @Title: FoolRegServerImpl
  * @date 2023/8/19 22:19
  * @description 远程地址获得器
  */
