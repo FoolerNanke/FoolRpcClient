@@ -55,7 +55,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/FRCApplication.java</exclude>
+                        <exclude>com/scj/foolRpcClient/testConsumer/**.java</exclude>
+                        <exclude>com/scj/foolRpcClient/FRCApplication.java</exclude>
                     </excludes>
                 </configuration>
             </plugin>
