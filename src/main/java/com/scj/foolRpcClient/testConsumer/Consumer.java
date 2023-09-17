@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class Consumer {
 
-    @FoolRpcConsumer(consumeType = ConsumeType.CALLBACK, CallBackMethod = "callBack.callBack1")
+    @FoolRpcConsumer(consumeType = ConsumeType.CALLBACK,
+            CallBackMethod = "callBack.callBack1")
     private Call call;
 
     public String get(){

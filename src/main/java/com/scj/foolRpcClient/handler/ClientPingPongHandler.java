@@ -1,9 +1,12 @@
 package com.scj.foolRpcClient.handler;
 
+import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcBase.runnable.PingPongHandler;
 import com.scj.foolRpcClient.configration.SpringContextUtil;
 import com.scj.foolRpcClient.remote.FoolRegServer;
 import io.netty.channel.Channel;
+
+import java.util.Random;
 
 /**
  * @author: suchangjie.NANKE
@@ -13,16 +16,24 @@ import io.netty.channel.Channel;
  */
 public class ClientPingPongHandler extends PingPongHandler {
 
+    private static final Random rand = new Random();
+
     /**
      * 添加心跳请求托管
      * @param channel 通道
+     * @param random 是否添加随机间隔时间
      */
-    public static void addPingPong(Channel channel){
-        new ClientPingPongHandler(channel);
+    public static void addPingPong(Channel channel, boolean random){
+        long gap = Constant.PING_PONG_TIME_GAP;
+        if (random) {
+            // 随机固定间隔
+            gap += rand.nextInt((int) Constant.PING_PONG_TIME_GAP);
+        }
+        new ClientPingPongHandler(channel, gap);
     }
 
-    private ClientPingPongHandler(Channel channel) {
-        super(channel);
+    private ClientPingPongHandler(Channel channel, long gap) {
+        super(channel, gap);
     }
 
     @Override

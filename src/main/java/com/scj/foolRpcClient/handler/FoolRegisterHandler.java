@@ -21,25 +21,14 @@ public class FoolRegisterHandler extends SimpleChannelInboundHandler<FoolProtoco
     protected void channelRead0(ChannelHandlerContext ctx
             , FoolProtocol<Object> foolProtocol) {
         byte remoteType = foolProtocol.getRemoteType();
-        switch (remoteType){
+        Object obj = foolProtocol.getData();
+        if (remoteType == Constant.REGISTER_RESP_REG_CLASS) {
             // 注册bean
-            case Constant.REGISTER_REQ_REG_CLASS:
-                FoolCommonResp data = (FoolCommonResp)foolProtocol.getData();
-                if (!data.getCode().equals(ExceptionEnum.SUCCESS.getErrorCode())){
-                    log.error("注册异常, code:{} message:{}", data.getCode(), data.getMessage());
-                }
-                ctx.fireChannelRead(foolProtocol);
-                break;
-            // 注册中心发出的心跳检测请求
-            case Constant.PING_REQ:
-                FoolProtocol<FoolCommonResp> respFoolProtocol = new FoolProtocol<>();
-                respFoolProtocol.setRemoteType(Constant.PONG_RESP);
-                respFoolProtocol.setReqId(foolProtocol.getReqId());
-                respFoolProtocol.setData(new FoolCommonResp());
-                log.info("收到心跳请求 reqId = {}", foolProtocol.getReqId());
-                ctx.writeAndFlush(respFoolProtocol);
-                ctx.fireChannelRead(foolProtocol);
-                break;
+            FoolCommonResp data = (FoolCommonResp)obj;
+            if (!data.getCode().equals(ExceptionEnum.SUCCESS.getErrorCode())){
+                log.error("注册异常, code:{} message:{}", data.getCode(), data.getMessage());
+            }
         }
+        ctx.fireChannelRead(foolProtocol);
     }
 }
