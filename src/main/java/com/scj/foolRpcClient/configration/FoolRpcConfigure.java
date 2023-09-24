@@ -3,7 +3,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @author suchangjie.NANKE
- * @Title: FoolRpcConfigura
+ * @Title: FoolRpcConfigure
  * @date 2023/8/23 13:09
  * @description 对外配置类
  */

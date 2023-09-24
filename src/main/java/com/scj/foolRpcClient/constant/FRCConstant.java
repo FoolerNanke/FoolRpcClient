@@ -6,7 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 
 /**
  * @author suchangjie.NANKE
- * @Title: StaticMap
+ * @Title: FRCConstant
  * @date 2023/8/19 21:00
  * @description 全局信息存储对象
  */

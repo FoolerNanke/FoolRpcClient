@@ -4,7 +4,7 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 
 /**
  * @author suchangjie.NANKE
- * @Title: FoolProxy
+ * @Title: AbstractFoolProxy
  * @date 2023/8/12 20:20
  * @description
  * 代理接口
