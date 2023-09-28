@@ -24,7 +24,7 @@ public class ClientPingPongHandler extends PingPongHandler {
      * @param random 是否添加随机间隔时间
      */
     public static void addPingPong(Channel channel, boolean random){
-        long gap = Constant.PING_PONG_TIME_GAP;
+        long gap = 10 * Constant.PING_PONG_TIME_GAP;
         if (random) {
             // 随机固定间隔
             gap += rand.nextInt((int) Constant.PING_PONG_TIME_GAP);

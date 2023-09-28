@@ -8,6 +8,7 @@ import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcClient.remote.FoolRegServer;
+import com.scj.foolRpcClient.utils.CommonUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
@@ -56,6 +57,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
          */
         FoolRpcProvider provider = clazz.getAnnotation(FoolRpcProvider.class);
         if (provider != null){
+            // 获取bean注册在注册中心的名称
+            String uniqueName = provider.uniqueName();
             Class<?>[] interfaces = clazz.getInterfaces();
             // 对所有继承的接口进行映射扩展
             for (Class<?> inter : interfaces) {
@@ -64,10 +67,11 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                  如果一个接口存在多个实现 且均被 @FoolRpcProvider 修饰
                  则只会存储最后一个被扫描到的Bean
                  */
-                providerService.put(inter.getName(), bean,
+                String regName = CommonUtil.buildName(inter.getName(), uniqueName);
+                providerService.put(regName, bean,
                         inter.getPackage().getImplementationVersion());
                 // 将类信息注册到注册中心
-                foolRegServer.registerClass(inter.getName()
+                foolRegServer.registerClass(regName
                         , inter.getPackage().getImplementationVersion());
             }
         }
@@ -83,6 +87,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
             declaredField.setAccessible(true);
             // 方法增强
             try {
+                // 服务别名
+                String uniqueName = annotation.uniqueName();
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(declaredField.getType());
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {

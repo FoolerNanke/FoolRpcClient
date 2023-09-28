@@ -8,8 +8,10 @@ import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
+import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcClient.remote.FoolRegServer;
+import com.scj.foolRpcClient.utils.CommonUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -42,7 +44,8 @@ public class DefaultProxy extends AbstractFoolProxy {
         /*
         通过全类名获取下游地址
          */
-        String fullClassName = obj.getClass().getName().split("\\$\\$")[0];
+        String uniqueName = obj.getClass().getAnnotation(FoolRpcConsumer.class).uniqueName();
+        String fullClassName = CommonUtil.buildName(obj.getClass().getName().split("\\$\\$")[0], uniqueName);
         // 获取版本
         String version = obj.getClass().getPackage().getImplementationVersion();
         // 从注册中心获取请求地址

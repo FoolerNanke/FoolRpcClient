@@ -55,5 +55,11 @@ public @interface FoolRpcConsumer {
      * @return 默认链接为空
      */
     String defaultLink() default "";
+
+    /**
+     * 服务别名
+     * @return 默认为空
+     */
+    String uniqueName() default "";
 }
 

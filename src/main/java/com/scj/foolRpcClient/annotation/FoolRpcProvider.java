@@ -20,5 +20,5 @@ public @interface FoolRpcProvider {
      * 可扩展字段
      * @return value
      */
-    String value() default "";
+    String uniqueName() default ".";
 }
