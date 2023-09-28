@@ -4,7 +4,7 @@ import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
 import com.scj.foolRpcClient.configration.providerServer.ProviderService;
-import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
+import com.scj.foolRpcClient.configration.comsumerProxy.FoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcClient.remote.FoolRegServer;
@@ -41,7 +41,7 @@ import java.util.concurrent.ExecutionException;
 public class FoolBeanPostProcessor implements BeanPostProcessor {
 
     @Autowired
-    private AbstractFoolProxy abstractFoolProxy;
+    private FoolProxy abstractFoolProxy;
 
     @Autowired
     private FoolRegServer foolRegServer;

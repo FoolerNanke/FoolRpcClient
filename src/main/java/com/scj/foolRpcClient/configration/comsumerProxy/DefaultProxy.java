@@ -34,7 +34,7 @@ import java.net.InetSocketAddress;
 
 @Slf4j
 @Component
-public class DefaultProxy extends AbstractFoolProxy {
+public class DefaultProxy extends FoolProxy {
 
     @Autowired
     private FoolRegServer remoteServer;

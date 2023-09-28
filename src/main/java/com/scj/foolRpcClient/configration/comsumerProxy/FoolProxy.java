@@ -9,6 +9,6 @@ import org.springframework.cglib.proxy.MethodInterceptor;
  * @description
  * 代理接口
  */
-public abstract class AbstractFoolProxy implements MethodInterceptor {
+public abstract class FoolProxy implements MethodInterceptor {
 
 }
