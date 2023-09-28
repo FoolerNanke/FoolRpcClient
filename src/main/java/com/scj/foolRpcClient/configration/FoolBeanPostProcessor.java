@@ -88,7 +88,6 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
             // 方法增强
             try {
                 // 服务别名
-                String uniqueName = annotation.uniqueName();
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(declaredField.getType());
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
