@@ -20,12 +20,6 @@ import java.util.concurrent.TimeUnit;
 public @interface FoolRpcConsumer {
 
     /**
-     * 可扩展数据
-     * @return value
-     */
-    String value() default "fool.NANKE";
-
-    /**
      * 超时时间
      * @return 默认超时时间数据为 3000
      */
@@ -49,12 +43,6 @@ public @interface FoolRpcConsumer {
      * 注：该 bean 必须被 Spring 托管 FoolRpc 不负责生成 bean
      */
     String CallBackMethod() default "";
-
-    /**
-     * 当在注册中心无法找到链接时
-     * @return 默认链接为空
-     */
-    String defaultLink() default "";
 
     /**
      * 服务别名
