@@ -8,8 +8,10 @@ import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
+import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.constant.FRCConstant;
 import com.scj.foolRpcClient.remote.FoolRegServer;
+import com.scj.foolRpcClient.utils.CommonUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * @author suchangjie.NANKE
@@ -32,17 +35,19 @@ import java.net.InetSocketAddress;
 
 @Slf4j
 @Component
-public class DefaultProxy extends AbstractFoolProxy {
+public class DefaultProxy extends FoolProxy {
 
     @Autowired
     private FoolRegServer remoteServer;
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws FoolException{
+    public Object intercept(Object obj, Method method, Object[] args0, MethodProxy proxy) throws FoolException{
         /*
         通过全类名获取下游地址
          */
-        String fullClassName = obj.getClass().getName().split("\\$\\$")[0];
+        String fullClassName = CommonUtil.buildName(obj.getClass().getName().split("\\$\\$")[0]
+                ,args0[args0.length - 1].toString());
+        Object[] args = Arrays.copyOf(args0, args0.length-1);
         // 获取版本
         String version = obj.getClass().getPackage().getImplementationVersion();
         // 从注册中心获取请求地址

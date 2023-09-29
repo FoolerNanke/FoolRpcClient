@@ -14,6 +14,7 @@ import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcBase.handler.in.FoolProtocolDecode;
 import com.scj.foolRpcClient.handler.ClientPingPongHandler;
+import com.scj.foolRpcClient.handler.ErrorHandler;
 import com.scj.foolRpcClient.handler.FoolRegisterHandler;
 import com.scj.foolRpcBase.handler.out.FoolProtocolEncode;
 import io.netty.bootstrap.Bootstrap;
@@ -56,7 +57,6 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
 
     @Override
     public InetSocketAddress getRpcAddress(String path, String version) {
-        // return new InetSocketAddress("localhost", 5001);
         FoolProtocol<FoolCommonReq> reqFoolProtocol = buildRegReq(path, version);
         // 填充请求类型
         reqFoolProtocol.setRemoteType(Constant.REGISTER_REQ_GET_IP);
@@ -74,10 +74,15 @@ public class FoolRegServerImpl implements FoolRegServer, InitializingBean {
             // 返回下游地址
             return new InetSocketAddress(resp.getIP(), Constant.REMOTE_PORT);
         } catch (InterruptedException
-                 | ExecutionException
-                 | TimeoutException e) {
+                 | ExecutionException e) {
             log.error("无法获取服务提供地址");
             throw new FoolException(ExceptionEnum.GET_REMOTE_SERVER_ERROR, e);
+        } catch (TimeoutException e){
+            // 超时异常 说明连接不稳定或者连接已经断开
+            // 重新注册连接
+            ErrorHandler.reRegister();
+            // 再次获取
+            return getRpcAddress(path, version);
         }
     }
 

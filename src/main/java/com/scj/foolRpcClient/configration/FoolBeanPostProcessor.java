@@ -4,10 +4,11 @@ import com.scj.foolRpcBase.entity.FoolRemoteResp;
 import com.scj.foolRpcClient.annotation.FoolRpcConsumer;
 import com.scj.foolRpcClient.annotation.FoolRpcProvider;
 import com.scj.foolRpcClient.configration.providerServer.ProviderService;
-import com.scj.foolRpcClient.configration.comsumerProxy.AbstractFoolProxy;
+import com.scj.foolRpcClient.configration.comsumerProxy.FoolProxy;
 import com.scj.foolRpcBase.exception.ExceptionEnum;
 import com.scj.foolRpcBase.exception.FoolException;
 import com.scj.foolRpcClient.remote.FoolRegServer;
+import com.scj.foolRpcClient.utils.CommonUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.FutureListener;
 import io.netty.util.concurrent.Promise;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -40,7 +42,7 @@ import java.util.concurrent.ExecutionException;
 public class FoolBeanPostProcessor implements BeanPostProcessor {
 
     @Autowired
-    private AbstractFoolProxy abstractFoolProxy;
+    private FoolProxy foolProxy;
 
     @Autowired
     private FoolRegServer foolRegServer;
@@ -56,6 +58,8 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
          */
         FoolRpcProvider provider = clazz.getAnnotation(FoolRpcProvider.class);
         if (provider != null){
+            // 获取bean注册在注册中心的名称
+            String uniqueName = provider.uniqueName();
             Class<?>[] interfaces = clazz.getInterfaces();
             // 对所有继承的接口进行映射扩展
             for (Class<?> inter : interfaces) {
@@ -64,10 +68,11 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
                  如果一个接口存在多个实现 且均被 @FoolRpcProvider 修饰
                  则只会存储最后一个被扫描到的Bean
                  */
-                providerService.put(inter.getName(), bean,
+                String regName = CommonUtil.buildName(inter.getName(), uniqueName);
+                providerService.put(regName, bean,
                         inter.getPackage().getImplementationVersion());
                 // 将类信息注册到注册中心
-                foolRegServer.registerClass(inter.getName()
+                foolRegServer.registerClass(regName
                         , inter.getPackage().getImplementationVersion());
             }
         }
@@ -83,12 +88,17 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
             declaredField.setAccessible(true);
             // 方法增强
             try {
+                // 服务别名
+                String uniqueName = annotation.uniqueName();
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(declaredField.getType());
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
+                    Object[] newObj = new Object[objects.length + 1];
+                    System.arraycopy(objects,0, newObj, 0, objects.length);
+                    newObj[newObj.length - 1] = uniqueName;
                     // 类型强转
-                    Promise<?> intercept = (Promise<?>) abstractFoolProxy
-                            .intercept(o, method, objects, methodProxy);
+                    Promise<?> intercept = (Promise<?>) foolProxy
+                            .intercept(o, method, newObj, methodProxy);
                     // 获取响应结果
                     // 等待时间取自 消费注解
                     switch (annotation.consumeType()) {

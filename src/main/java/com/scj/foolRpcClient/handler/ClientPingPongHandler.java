@@ -2,8 +2,6 @@ package com.scj.foolRpcClient.handler;
 
 import com.scj.foolRpcBase.constant.Constant;
 import com.scj.foolRpcBase.runnable.PingPongHandler;
-import com.scj.foolRpcClient.configration.SpringContextUtil;
-import com.scj.foolRpcClient.remote.FoolRegServer;
 import io.netty.channel.Channel;
 
 import java.util.Random;
@@ -24,7 +22,7 @@ public class ClientPingPongHandler extends PingPongHandler {
      * @param random 是否添加随机间隔时间
      */
     public static void addPingPong(Channel channel, boolean random){
-        long gap = Constant.PING_PONG_TIME_GAP;
+        long gap = 10 * Constant.PING_PONG_TIME_GAP;
         if (random) {
             // 随机固定间隔
             gap += rand.nextInt((int) Constant.PING_PONG_TIME_GAP);
@@ -41,11 +39,6 @@ public class ClientPingPongHandler extends PingPongHandler {
         super.handError(t);
         // 心跳失败 说明注册中心挂掉了
         // 则需要重新连接注册中心
-        FoolRegServer foolRegServer = (FoolRegServer)SpringContextUtil
-                .getBeanByClazz(FoolRegServer.class);
-        // 尝试重新连接
-        foolRegServer.connect();
-        // 重新注册
-        foolRegServer.registerAgain();
+        ErrorHandler.reRegister();
     }
 }
