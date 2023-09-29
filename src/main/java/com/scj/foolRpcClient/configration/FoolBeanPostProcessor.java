@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -41,7 +42,7 @@ import java.util.concurrent.ExecutionException;
 public class FoolBeanPostProcessor implements BeanPostProcessor {
 
     @Autowired
-    private FoolProxy abstractFoolProxy;
+    private FoolProxy foolProxy;
 
     @Autowired
     private FoolRegServer foolRegServer;
@@ -88,12 +89,16 @@ public class FoolBeanPostProcessor implements BeanPostProcessor {
             // 方法增强
             try {
                 // 服务别名
+                String uniqueName = annotation.uniqueName();
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(declaredField.getType());
                 enhancer.setCallback((MethodInterceptor) (o, method, objects, methodProxy) -> {
+                    Object[] newObj = new Object[objects.length + 1];
+                    System.arraycopy(objects,0, newObj, 0, objects.length);
+                    newObj[newObj.length - 1] = uniqueName;
                     // 类型强转
-                    Promise<?> intercept = (Promise<?>) abstractFoolProxy
-                            .intercept(o, method, objects, methodProxy);
+                    Promise<?> intercept = (Promise<?>) foolProxy
+                            .intercept(o, method, newObj, methodProxy);
                     // 获取响应结果
                     // 等待时间取自 消费注解
                     switch (annotation.consumeType()) {

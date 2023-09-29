@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 /**
  * @author suchangjie.NANKE
@@ -40,12 +41,13 @@ public class DefaultProxy extends FoolProxy {
     private FoolRegServer remoteServer;
 
     @Override
-    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws FoolException{
+    public Object intercept(Object obj, Method method, Object[] args0, MethodProxy proxy) throws FoolException{
         /*
         通过全类名获取下游地址
          */
-        String uniqueName = obj.getClass().getAnnotation(FoolRpcConsumer.class).uniqueName();
-        String fullClassName = CommonUtil.buildName(obj.getClass().getName().split("\\$\\$")[0], uniqueName);
+        String fullClassName = CommonUtil.buildName(obj.getClass().getName().split("\\$\\$")[0]
+                ,args0[args0.length - 1].toString());
+        Object[] args = Arrays.copyOf(args0, args0.length-1);
         // 获取版本
         String version = obj.getClass().getPackage().getImplementationVersion();
         // 从注册中心获取请求地址

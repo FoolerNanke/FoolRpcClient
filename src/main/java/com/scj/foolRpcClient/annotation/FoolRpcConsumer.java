@@ -48,6 +48,6 @@ public @interface FoolRpcConsumer {
      * 服务别名
      * @return 默认为空
      */
-    String uniqueName() default "";
+    String uniqueName() default ".";
 }
 

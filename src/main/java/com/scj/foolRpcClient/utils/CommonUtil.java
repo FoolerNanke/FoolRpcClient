@@ -4,7 +4,8 @@ package com.scj.foolRpcClient.utils;
  * @author: suchangjie.NANKE
  * @Title: CommonUtil
  * @date: 2023/9/28
- * @description: //TODO
+ * @description:
+ * 常用工具类
  */
 public class CommonUtil {
 
